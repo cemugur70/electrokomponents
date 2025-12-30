@@ -1,0 +1,44 @@
+<!-- Account Sidebar Partial -->
+<aside class="account-sidebar">
+    <div class="user-info">
+        <div class="user-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="user-details">
+            <h3>
+                <%= user.ad %>
+                    <%= user.soyad %>
+            </h3>
+            <span>
+                <%= user.email %>
+            </span>
+        </div>
+    </div>
+
+    <nav class="account-nav">
+        <a href="/hesabim" class="nav-link <%= activePage === 'hesabim' ? 'active' : '' %>">
+            <i class="fas fa-user-circle"></i>
+            Hesap Bilgilerim
+        </a>
+        <a href="/siparislerim" class="nav-link <%= activePage === 'siparislerim' ? 'active' : '' %>">
+            <i class="fas fa-box"></i>
+            Siparişlerim
+        </a>
+        <a href="/adreslerim" class="nav-link <%= activePage === 'adreslerim' ? 'active' : '' %>">
+            <i class="fas fa-map-marker-alt"></i>
+            Adreslerim
+        </a>
+        <a href="/favorilerim" class="nav-link <%= activePage === 'favorilerim' ? 'active' : '' %>">
+            <i class="fas fa-heart"></i>
+            Favorilerim
+        </a>
+        <a href="/sifre-degistir" class="nav-link <%= activePage === 'sifre' ? 'active' : '' %>">
+            <i class="fas fa-lock"></i>
+            Şifre Değiştir
+        </a>
+        <a href="/auth/cikis" class="nav-link logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Çıkış Yap
+        </a>
+    </nav>
+</aside>

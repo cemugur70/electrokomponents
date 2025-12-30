@@ -1,0 +1,295 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li><a href="/hesabim">Hesabım</a></li>
+            <li class="active">Favorilerim</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="account-page">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar -->
+            <%- include('../partials/account-sidebar', { activePage: 'favorilerim' }) %>
+
+                <!-- Content -->
+                <main class="account-content favorites-content">
+                    <div class="content-header">
+                        <h1>Favorilerim</h1>
+                        <span class="favorites-count">
+                            <%= favoriler.length %> ürün
+                        </span>
+                    </div>
+
+                    <% if (favoriler && favoriler.length> 0) { %>
+                        <div class="favorites-grid">
+                            <% favoriler.forEach(favori=> { %>
+                                <% const urun=favori.urun; %>
+                                    <div class="favorite-card" data-product-id="<%= urun.id %>">
+                                        <button class="remove-favorite" onclick="removeFavorite(<%= urun.id %>)"
+                                            title="Favorilerden Çıkar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+
+                                        <a href="/urun/<%= urun.slug %>" class="favorite-image">
+                                            <% if (urun.resimler && urun.resimler.length> 0) { %>
+                                                <img src="<%= urun.resimler[0].resim_url %>" alt="<%= urun.ad %>">
+                                                <% } else { %>
+                                                    <img src="/images/no-image.png" alt="<%= urun.ad %>">
+                                                    <% } %>
+                                        </a>
+
+                                        <div class="favorite-info">
+                                            <% if (urun.marka) { %>
+                                                <span class="favorite-brand">
+                                                    <%= urun.marka.ad %>
+                                                </span>
+                                                <% } %>
+                                                    <a href="/urun/<%= urun.slug %>" class="favorite-title">
+                                                        <%= urun.ad.substring(0, 60) %>
+                                                            <%= urun.ad.length> 60 ? '...' : '' %>
+                                                    </a>
+                                                    <span class="favorite-pn">
+                                                        <%= urun.parca_no %>
+                                                    </span>
+
+                                                    <div class="favorite-price-row">
+                                                        <span class="favorite-price">
+                                                            <%= parseFloat(urun.fiyat).toFixed(2).replace('.', ',' ) %>
+                                                                ₺
+                                                        </span>
+                                                        <% if (urun.stok> 0) { %>
+                                                            <span class="stock-status in-stock">Stokta</span>
+                                                            <% } else { %>
+                                                                <span class="stock-status out-of-stock">Stok Yok</span>
+                                                                <% } %>
+                                                    </div>
+                                        </div>
+
+                                        <div class="favorite-actions">
+                                            <button class="btn btn-primary btn-block btn-add-cart"
+                                                data-product-id="<%= urun.id %>" <%=urun.stok <=0 ? 'disabled' : '' %>>
+                                                <i class="fas fa-shopping-cart"></i>
+                                                Sepete Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                        </div>
+                        <% } else { %>
+                            <div class="no-favorites">
+                                <i class="fas fa-heart"></i>
+                                <h3>Favori Ürününüz Yok</h3>
+                                <p>Beğendiğiniz ürünleri favorilere ekleyerek daha sonra kolayca ulaşabilirsiniz.</p>
+                                <a href="/urunler" class="btn btn-primary">
+                                    <i class="fas fa-shopping-bag"></i> Ürünlere Göz At
+                                </a>
+                            </div>
+                            <% } %>
+                </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    .favorites-content {
+        padding: 0 !important;
+    }
+
+    .favorites-content .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 0;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .favorites-count {
+        color: var(--text-muted);
+    }
+
+    .favorites-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1px;
+        background: var(--border-color);
+    }
+
+    .favorite-card {
+        position: relative;
+        background: var(--bg-card);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .remove-favorite {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        background: rgba(239, 68, 68, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: var(--color-error);
+        cursor: pointer;
+        z-index: 1;
+        transition: all 0.2s;
+    }
+
+    .remove-favorite:hover {
+        background: var(--color-error);
+        color: white;
+    }
+
+    .favorite-image {
+        display: block;
+        aspect-ratio: 1;
+        padding: 20px;
+        background: var(--bg-input);
+        border-radius: var(--radius-md);
+        margin-bottom: 16px;
+    }
+
+    .favorite-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .favorite-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .favorite-brand {
+        font-size: 0.8rem;
+        color: var(--color-primary);
+        font-weight: 500;
+    }
+
+    .favorite-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.4;
+    }
+
+    .favorite-title:hover {
+        color: var(--color-primary);
+    }
+
+    .favorite-pn {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-family: monospace;
+    }
+
+    .favorite-price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 12px;
+    }
+
+    .favorite-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .stock-status {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .stock-status.in-stock {
+        color: var(--color-success);
+    }
+
+    .stock-status.out-of-stock {
+        color: var(--color-error);
+    }
+
+    .favorite-actions {
+        margin-top: 16px;
+    }
+
+    .no-favorites {
+        text-align: center;
+        padding: 80px 40px;
+        background: var(--bg-card);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .no-favorites i {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+    }
+
+    .no-favorites h3 {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+    }
+
+    .no-favorites p {
+        color: var(--text-muted);
+        margin-bottom: 24px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+        .favorites-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    async function removeFavorite(productId) {
+        try {
+            const response = await fetch('/api/favoriler/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urun_id: productId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Remove the card with animation
+                const card = document.querySelector(`.favorite-card[data-product-id="${productId}"]`);
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        card.remove();
+                        // Update count
+                        const countEl = document.querySelector('.favorites-count');
+                        const remaining = document.querySelectorAll('.favorite-card').length;
+                        if (countEl) countEl.textContent = remaining + ' ürün';
+
+                        // Show empty state if no more favorites
+                        if (remaining === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+</script>

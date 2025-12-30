@@ -1,0 +1,710 @@
+<!-- Hero Slider -->
+<section class="hero-slider">
+    <div class="slider-container" id="heroSlider">
+        <% if (sliders && sliders.length> 0) { %>
+            <% sliders.forEach((slide, index)=> { %>
+                <div class="slide <%= index === 0 ? 'active' : '' %>"
+                    style="background-image: url('<%= slide.resim_url || '/images/slider-default.jpg' %>')">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="container">
+                            <% if (slide.alt_baslik) { %>
+                                <span class="slide-subtitle">
+                                    <%= slide.alt_baslik %>
+                                </span>
+                                <% } %>
+                                    <h1 class="slide-title">
+                                        <%= slide.baslik || 'ElectroKomponents' %>
+                                    </h1>
+                                    <% if (slide.aciklama) { %>
+                                        <p class="slide-description">
+                                            <%= slide.aciklama %>
+                                        </p>
+                                        <% } %>
+                                            <% if (slide.link) { %>
+                                                <a href="<%= slide.link %>" class="btn btn-primary btn-lg">
+                                                    <%= slide.buton_text || 'Keşfet' %>
+                                                        <i class="fas fa-arrow-right"></i>
+                                                </a>
+                                                <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+                    <% } else { %>
+                        <div class="slide active" style="background: linear-gradient(135deg, #1e3a5f 0%, #0a1628 100%)">
+                            <div class="slide-content">
+                                <div class="container">
+                                    <span class="slide-subtitle">Endüstriyel Çözümler</span>
+                                    <h1 class="slide-title">Elektronik Komponent<br>Tedarikçiniz</h1>
+                                    <p class="slide-description">50.000'den fazla ürün, hızlı teslimat ve teknik destek
+                                    </p>
+                                    <a href="/kategori/yari-iletkenler" class="btn btn-primary btn-lg">
+                                        Ürünleri Keşfet
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <!-- Slider Controls -->
+                            <button class="slider-arrow prev" id="sliderPrev">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="slider-arrow next" id="sliderNext">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+
+                            <!-- Slider Dots -->
+                            <div class="slider-dots" id="sliderDots">
+                                <% if (sliders && sliders.length> 0) { %>
+                                    <% sliders.forEach((slide, index)=> { %>
+                                        <button class="dot <%= index === 0 ? 'active' : '' %>"
+                                            data-index="<%= index %>"></button>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <button class="dot active" data-index="0"></button>
+                                                <% } %>
+                            </div>
+    </div>
+</section>
+
+<!-- Öne Çıkan Kategoriler -->
+<section class="featured-categories section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-th-large"></i>
+                Popüler Kategoriler
+            </h2>
+            <a href="/kategoriler" class="section-link">
+                Tümünü Gör <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="category-grid">
+            <% const categoryIcons={ 'mikrodenetleyiciler' : 'fas fa-microchip' , 'direncler' : 'fas fa-wave-square'
+                , 'roleler' : 'fas fa-toggle-on' , 'sensorler' : 'fas fa-broadcast-tower' , 'klemens-bloklari'
+                : 'fas fa-plug' , 'kapasitorler' : 'fas fa-battery-half' }; %>
+
+                <% if (kategoriler && kategoriler.length> 0) { %>
+                    <% kategoriler.forEach(kategori=> { %>
+                        <a href="/kategori/<%= kategori.slug %>" class="category-card">
+                            <div class="category-icon">
+                                <i class="<%= kategori.icon || categoryIcons[kategori.slug] || 'fas fa-cube' %>"></i>
+                            </div>
+                            <h3>
+                                <%= kategori.ad %>
+                            </h3>
+                            <span class="category-count">Ürünleri Keşfet</span>
+                        </a>
+                        <% }) %>
+                            <% } else { %>
+                                <!-- Default kategoriler -->
+                                <a href="/kategori/mikrodenetleyiciler" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-microchip"></i></div>
+                                    <h3>Mikrodenetleyiciler</h3>
+                                    <span class="category-count">500+ Ürün</span>
+                                </a>
+                                <a href="/kategori/direncler" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-wave-square"></i></div>
+                                    <h3>Dirençler</h3>
+                                    <span class="category-count">2000+ Ürün</span>
+                                </a>
+                                <a href="/kategori/roleler" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-toggle-on"></i></div>
+                                    <h3>Röleler</h3>
+                                    <span class="category-count">300+ Ürün</span>
+                                </a>
+                                <a href="/kategori/sensorler" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-broadcast-tower"></i></div>
+                                    <h3>Sensörler</h3>
+                                    <span class="category-count">400+ Ürün</span>
+                                </a>
+                                <a href="/kategori/klemens-bloklari" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-plug"></i></div>
+                                    <h3>Klemens Blokları</h3>
+                                    <span class="category-count">200+ Ürün</span>
+                                </a>
+                                <a href="/kategori/kapasitorler" class="category-card">
+                                    <div class="category-icon"><i class="fas fa-battery-half"></i></div>
+                                    <h3>Kapasitörler</h3>
+                                    <span class="category-count">1500+ Ürün</span>
+                                </a>
+                                <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Öne Çıkan Ürünler -->
+<section class="featured-products section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i>
+                Öne Çıkan Ürünler
+            </h2>
+            <a href="/urunler?one_cikan=1" class="section-link">
+                Tümünü Gör <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="product-grid">
+            <% if (oneCikanUrunler && oneCikanUrunler.length> 0) { %>
+                <% oneCikanUrunler.forEach(urun=> { %>
+                    <%- include('../partials/product-card', { urun }) %>
+                        <% }) %>
+                            <% } else { %>
+                                <p class="no-products">Henüz öne çıkan ürün bulunmuyor.</p>
+                                <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Neden Biz? -->
+<section class="why-us section">
+    <div class="container">
+        <div class="why-us-grid">
+            <div class="why-us-item">
+                <div class="why-us-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3>Hızlı Teslimat</h3>
+                <p>Aynı gün kargo ile siparişleriniz hızlıca elinize ulaşır.</p>
+            </div>
+            <div class="why-us-item">
+                <div class="why-us-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Orijinal Ürünler</h3>
+                <p>Tüm ürünlerimiz orijinal ve garantilidir.</p>
+            </div>
+            <div class="why-us-item">
+                <div class="why-us-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Teknik Destek</h3>
+                <p>Uzman ekibimiz teknik sorularınıza yardımcı olur.</p>
+            </div>
+            <div class="why-us-item">
+                <div class="why-us-icon">
+                    <i class="fas fa-undo-alt"></i>
+                </div>
+                <h3>Kolay İade</h3>
+                <p>14 gün içinde koşulsuz iade garantisi.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Yeni Ürünler -->
+<section class="new-products section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Yeni Eklenen Ürünler
+            </h2>
+            <a href="/urunler?siralama=yeni" class="section-link">
+                Tümünü Gör <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="product-grid">
+            <% if (yeniUrunler && yeniUrunler.length> 0) { %>
+                <% yeniUrunler.slice(0, 8).forEach(urun=> { %>
+                    <%- include('../partials/product-card', { urun }) %>
+                        <% }) %>
+                            <% } else { %>
+                                <p class="no-products">Henüz ürün bulunmuyor.</p>
+                                <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Markalar -->
+<section class="brands section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-award"></i>
+                Çalıştığımız Markalar
+            </h2>
+        </div>
+
+        <div class="brands-carousel" id="brandsCarousel">
+            <div class="brands-track">
+                <% if (markalar && markalar.length> 0) { %>
+                    <% markalar.forEach(marka=> { %>
+                        <a href="/marka/<%= marka.slug %>" class="brand-item">
+                            <% if (marka.logo) { %>
+                                <img src="<%= marka.logo %>" alt="<%= marka.ad %>">
+                                <% } else { %>
+                                    <span>
+                                        <%= marka.ad %>
+                                    </span>
+                                    <% } %>
+                        </a>
+                        <% }) %>
+                            <% } else { %>
+                                <div class="brand-item"><span>Texas Instruments</span></div>
+                                <div class="brand-item"><span>STMicroelectronics</span></div>
+                                <div class="brand-item"><span>Microchip</span></div>
+                                <div class="brand-item"><span>NXP</span></div>
+                                <div class="brand-item"><span>Analog Devices</span></div>
+                                <div class="brand-item"><span>Infineon</span></div>
+                                <div class="brand-item"><span>ON Semiconductor</span></div>
+                                <div class="brand-item"><span>Vishay</span></div>
+                                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Home Page Specific Styles */
+
+    /* Hero Slider */
+    .hero-slider {
+        position: relative;
+        height: 500px;
+        overflow: hidden;
+    }
+
+    .slider-container {
+        position: relative;
+        height: 100%;
+    }
+
+    .slide {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(10, 22, 40, 0.95) 0%, rgba(10, 22, 40, 0.5) 100%);
+    }
+
+    .slide-content {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .slide-subtitle {
+        display: inline-block;
+        background: rgba(59, 130, 246, 0.2);
+        color: var(--color-primary);
+        padding: 8px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 16px;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .slide-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        max-width: 700px;
+    }
+
+    .slide-description {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        max-width: 500px;
+    }
+
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-full);
+        color: white;
+        font-size: 1.2rem;
+        transition: all var(--transition-normal);
+        z-index: 10;
+    }
+
+    .slider-arrow:hover {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .slider-arrow.prev {
+        left: 30px;
+    }
+
+    .slider-arrow.next {
+        right: 30px;
+    }
+
+    .slider-dots {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        transition: all var(--transition-normal);
+    }
+
+    .dot.active,
+    .dot:hover {
+        background: var(--color-primary);
+        transform: scale(1.2);
+    }
+
+    /* Sections */
+    .section {
+        padding: 60px 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        color: var(--color-primary);
+    }
+
+    .section-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-primary);
+        font-weight: 500;
+        transition: gap var(--transition-fast);
+    }
+
+    .section-link:hover {
+        gap: 12px;
+    }
+
+    /* Category Grid */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px;
+    }
+
+    .category-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 30px 20px;
+        text-align: center;
+        transition: all var(--transition-normal);
+    }
+
+    .category-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--color-primary);
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .category-icon {
+        width: 70px;
+        height: 70px;
+        background: var(--gradient-primary);
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.75rem;
+        color: white;
+    }
+
+    .category-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .category-count {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    /* Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+
+    .no-products {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px;
+        color: var(--text-muted);
+    }
+
+    /* Why Us */
+    .why-us {
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .why-us-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+    }
+
+    .why-us-item {
+        text-align: center;
+    }
+
+    .why-us-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-glow);
+        border: 2px solid var(--color-primary);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: var(--color-primary);
+    }
+
+    .why-us-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .why-us-item p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    /* Brands */
+    .brands-carousel {
+        overflow: hidden;
+    }
+
+    .brands-track {
+        display: flex;
+        gap: 30px;
+        animation: scroll 30s linear infinite;
+    }
+
+    @keyframes scroll {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .brand-item {
+        flex-shrink: 0;
+        width: 180px;
+        height: 80px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: all var(--transition-normal);
+    }
+
+    .brand-item:hover {
+        border-color: var(--color-primary);
+        background: var(--bg-card-hover);
+    }
+
+    .brand-item img {
+        max-width: 100%;
+        max-height: 40px;
+        object-fit: contain;
+        filter: grayscale(100%) brightness(2);
+        transition: filter var(--transition-normal);
+    }
+
+    .brand-item:hover img {
+        filter: none;
+    }
+
+    .brand-item span {
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .category-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 992px) {
+        .hero-slider {
+            height: 400px;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+        }
+
+        .why-us-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-slider {
+            height: 350px;
+        }
+
+        .slide-title {
+            font-size: 2rem;
+        }
+
+        .slide-description {
+            font-size: 1rem;
+        }
+
+        .slider-arrow {
+            display: none;
+        }
+
+        .category-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .category-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .why-us-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    // Hero Slider
+    document.addEventListener('DOMContentLoaded', function () {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.getElementById('sliderPrev');
+        const nextBtn = document.getElementById('sliderNext');
+        let currentSlide = 0;
+        let slideInterval;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            if (index >= slides.length) index = 0;
+            if (index < 0) index = slides.length - 1;
+
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function startAutoSlide() {
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        function stopAutoSlide() {
+            clearInterval(slideInterval);
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoSlide(); prevSlide(); startAutoSlide(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoSlide(); nextSlide(); startAutoSlide(); });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                stopAutoSlide();
+                showSlide(index);
+                startAutoSlide();
+            });
+        });
+
+        if (slides.length > 1) {
+            startAutoSlide();
+        }
+    });
+</script>

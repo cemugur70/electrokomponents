@@ -1,0 +1,524 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <% if (kategori.ust_kategori) { %>
+                <li><a href="/kategori/<%= kategori.ust_kategori.slug %>">
+                        <%= kategori.ust_kategori.ad %>
+                    </a></li>
+                <% } %>
+                    <li class="active">
+                        <%= kategori.ad %>
+                    </li>
+        </ol>
+    </div>
+</nav>
+
+<div class="catalog-page">
+    <div class="container">
+        <div class="catalog-layout">
+            <!-- Sidebar Filtreler -->
+            <aside class="catalog-sidebar">
+                <div class="filter-header">
+                    <h3><i class="fas fa-filter"></i> Filtreler</h3>
+                    <button class="filter-clear" id="clearFilters">Temizle</button>
+                </div>
+
+                <form id="filterForm" method="GET" action="/kategori/<%= kategori.slug %>">
+                    <!-- Marka Filtresi -->
+                    <div class="filter-section">
+                        <h4>Marka</h4>
+                        <div class="filter-options">
+                            <% markalar.forEach(marka=> { %>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" name="marka" value="<%= marka.id %>" <%=query.marka &&
+                                        query.marka.includes(marka.id.toString()) ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <%= marka.ad %>
+                                </label>
+                                <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- Paket Tipi Filtresi -->
+                    <div class="filter-section">
+                        <h4>Paket Tipi</h4>
+                        <div class="filter-options">
+                            <% ['SMD', 'Radial' , 'DIP' , 'QFP' , 'BGA' , 'Diger' ].forEach(tip=> { %>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" name="paket_tipi" value="<%= tip %>" <%=query.paket_tipi &&
+                                        query.paket_tipi.includes(tip) ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    <%= tip==='Diger' ? 'Diğer' : tip %>
+                                </label>
+                                <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- Fiyat Aralığı -->
+                    <div class="filter-section">
+                        <h4>Fiyat Aralığı</h4>
+                        <div class="price-range">
+                            <input type="number" name="fiyat_min" placeholder="Min" value="<%= query.fiyat_min || '' %>"
+                                class="price-input">
+                            <span>-</span>
+                            <input type="number" name="fiyat_max" placeholder="Max" value="<%= query.fiyat_max || '' %>"
+                                class="price-input">
+                        </div>
+                    </div>
+
+                    <!-- Stok Durumu -->
+                    <div class="filter-section">
+                        <h4>Stok Durumu</h4>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="stok" value="1" <%=query.stok==='1' ? 'checked' : '' %>>
+                            <span class="checkmark"></span>
+                            Sadece Stoktakiler
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-search"></i> Filtrele
+                    </button>
+                </form>
+            </aside>
+
+            <!-- Ürün Listesi -->
+            <main class="catalog-main">
+                <!-- Kategori Başlığı -->
+                <div class="catalog-header">
+                    <div class="catalog-title-area">
+                        <h1>
+                            <%= kategori.ad %>
+                        </h1>
+                        <span class="product-count">
+                            <%= toplamUrun %> ürün bulundu
+                        </span>
+                    </div>
+
+                    <div class="catalog-controls">
+                        <!-- Sıralama -->
+                        <div class="sort-control">
+                            <label>Sırala:</label>
+                            <select id="sortSelect" onchange="updateSort(this.value)">
+                                <option value="yeni" <%=query.siralama==='yeni' ? 'selected' : '' %>>En Yeni</option>
+                                <option value="fiyat-artan" <%=query.siralama==='fiyat-artan' ? 'selected' : '' %>
+                                    >Fiyat: Düşükten Yükseğe</option>
+                                <option value="fiyat-azalan" <%=query.siralama==='fiyat-azalan' ? 'selected' : '' %>
+                                    >Fiyat: Yüksekten Düşüğe</option>
+                                <option value="ad" <%=query.siralama==='ad' ? 'selected' : '' %>>İsim A-Z</option>
+                            </select>
+                        </div>
+
+                        <!-- Görünüm -->
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alt Kategoriler -->
+                <% if (kategori.alt_kategoriler && kategori.alt_kategoriler.length> 0) { %>
+                    <div class="subcategories">
+                        <% kategori.alt_kategoriler.forEach(altKat=> { %>
+                            <a href="/kategori/<%= altKat.slug %>" class="subcategory-chip">
+                                <%= altKat.ad %>
+                            </a>
+                            <% }) %>
+                    </div>
+                    <% } %>
+
+                        <!-- Ürün Grid -->
+                        <div class="product-grid" id="productGrid">
+                            <% if (urunler && urunler.length> 0) { %>
+                                <% urunler.forEach(urun=> { %>
+                                    <%- include('../partials/product-card', { urun }) %>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <div class="no-products-found">
+                                                    <i class="fas fa-search"></i>
+                                                    <h3>Ürün Bulunamadı</h3>
+                                                    <p>Seçtiğiniz kriterlere uygun ürün bulunmuyor. Filtreleri
+                                                        değiştirmeyi deneyin.</p>
+                                                    <button class="btn btn-secondary"
+                                                        onclick="document.getElementById('clearFilters').click()">
+                                                        Filtreleri Temizle
+                                                    </button>
+                                                </div>
+                                                <% } %>
+                        </div>
+
+                        <!-- Sayfalama -->
+                        <% if (toplamSayfa> 1) { %>
+                            <nav class="pagination">
+                                <% if (mevcutSayfa> 1) { %>
+                                    <a href="?sayfa=<%= mevcutSayfa - 1 %>&<%= Object.entries(query).filter(([k]) => k !== 'sayfa').map(([k, v]) => `${k}=${v}`).join('&') %>"
+                                        class="pagination-btn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                    <% } %>
+
+                                        <% for (let i=1; i <=toplamSayfa; i++) { %>
+                                            <% if (i===1 || i===toplamSayfa || (i>= mevcutSayfa - 2 && i <= mevcutSayfa
+                                                    + 2)) { %>
+                                                    <a href="?sayfa=<%= i %>&<%= Object.entries(query).filter(([k]) => k !== 'sayfa').map(([k, v]) => `${k}=${v}`).join('&') %>"
+                                                        class="pagination-btn <%= i === mevcutSayfa ? 'active' : '' %>">
+                                                        <%= i %>
+                                                    </a>
+                                                    <% } else if (i===mevcutSayfa - 3 || i===mevcutSayfa + 3) { %>
+                                                        <span class="pagination-dots">...</span>
+                                                        <% } %>
+                                                            <% } %>
+
+                                                                <% if (mevcutSayfa < toplamSayfa) { %>
+                                                                    <a href="?sayfa=<%= mevcutSayfa + 1 %>&<%= Object.entries(query).filter(([k]) => k !== 'sayfa').map(([k, v]) => `${k}=${v}`).join('&') %>"
+                                                                        class="pagination-btn">
+                                                                        <i class="fas fa-chevron-right"></i>
+                                                                    </a>
+                                                                    <% } %>
+                            </nav>
+                            <% } %>
+            </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Breadcrumb */
+    .breadcrumb-nav {
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 0;
+    }
+
+    .breadcrumb-list {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb-list li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .breadcrumb-list li:not(:last-child)::after {
+        content: '/';
+        color: var(--text-muted);
+    }
+
+    .breadcrumb-list a {
+        color: var(--text-secondary);
+    }
+
+    .breadcrumb-list a:hover {
+        color: var(--color-primary);
+    }
+
+    .breadcrumb-list .active {
+        color: var(--text-primary);
+    }
+
+    /* Catalog Layout */
+    .catalog-page {
+        padding: 30px 0 60px;
+    }
+
+    .catalog-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+    }
+
+    /* Sidebar */
+    .catalog-sidebar {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        height: fit-content;
+        position: sticky;
+        top: 160px;
+    }
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .filter-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+    }
+
+    .filter-clear {
+        color: var(--color-primary);
+        font-size: 0.85rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .filter-section {
+        margin-bottom: 24px;
+    }
+
+    .filter-section h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text-secondary);
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .filter-checkbox input {
+        display: none;
+    }
+
+    .filter-checkbox .checkmark {
+        width: 18px;
+        height: 18px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .filter-checkbox input:checked+.checkmark {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .filter-checkbox input:checked+.checkmark::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 9px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .price-range {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .price-input {
+        flex: 1;
+        padding: 10px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    /* Catalog Main */
+    .catalog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .catalog-title-area h1 {
+        font-size: 1.75rem;
+        margin-bottom: 4px;
+    }
+
+    .product-count {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .catalog-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .sort-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sort-control label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .sort-control select {
+        padding: 10px 14px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 4px;
+    }
+
+    .view-btn {
+        width: 40px;
+        height: 40px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .view-btn.active,
+    .view-btn:hover {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: white;
+    }
+
+    /* Subcategories */
+    .subcategories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .subcategory-chip {
+        padding: 8px 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+    }
+
+    .subcategory-chip:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+
+    /* No Products */
+    .no-products-found {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+    }
+
+    .no-products-found i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .no-products-found h3 {
+        margin-bottom: 10px;
+    }
+
+    .no-products-found p {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+    }
+
+    .pagination-btn {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .pagination-btn:hover,
+    .pagination-btn.active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: white;
+    }
+
+    .pagination-dots {
+        color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .catalog-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .catalog-sidebar {
+            position: static;
+        }
+    }
+</style>
+
+<script>
+    function updateSort(value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('siralama', value);
+        url.searchParams.delete('sayfa');
+        window.location.href = url.toString();
+    }
+
+    document.getElementById('clearFilters').addEventListener('click', () => {
+        window.location.href = '/kategori/<%= kategori.slug %>';
+    });
+</script>

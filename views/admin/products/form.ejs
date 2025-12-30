@@ -1,0 +1,474 @@
+<% locals.currentPage='urunler' %>
+
+    <div class="page-header">
+        <h1 class="page-title">
+            <%= urun ? 'Ürün Düzenle' : 'Yeni Ürün Ekle' %>
+        </h1>
+        <a href="/admin/urunler" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri
+        </a>
+    </div>
+
+    <form action="/admin/urunler/<%= urun ? urun.id + '/guncelle' : 'kaydet' %>" method="POST"
+        enctype="multipart/form-data">
+        <div class="form-layout">
+            <!-- Sol: Ana Bilgiler -->
+            <div class="form-main">
+                <!-- Temel Bilgiler -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Temel Bilgiler</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Ürün Adı *</label>
+                            <input type="text" name="ad" class="form-control" required
+                                value="<%= urun ? urun.ad : '' %>">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Parça No (SKU) *</label>
+                                <input type="text" name="parca_no" class="form-control" required
+                                    value="<%= urun ? urun.parca_no : '' %>">
+                            </div>
+                            <div class="form-group">
+                                <label>Barkod</label>
+                                <input type="text" name="barkod" class="form-control"
+                                    value="<%= urun ? urun.barkod || '' : '' %>">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kısa Açıklama</label>
+                            <textarea name="kisa_aciklama" class="form-control"
+                                rows="2"><%= urun ? urun.kisa_aciklama || '' : '' %></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Açıklama</label>
+                            <textarea name="aciklama" class="form-control editor"
+                                rows="6"><%= urun ? urun.aciklama || '' : '' %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fiyat & Stok -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Fiyat & Stok</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fiyat (₺) *</label>
+                                <input type="number" name="fiyat" step="0.01" class="form-control" required
+                                    value="<%= urun ? urun.fiyat : '' %>">
+                            </div>
+                            <div class="form-group">
+                                <label>İndirimli Fiyat (₺)</label>
+                                <input type="number" name="indirimli_fiyat" step="0.01" class="form-control"
+                                    value="<%= urun ? urun.indirimli_fiyat || '' : '' %>">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Stok Adedi *</label>
+                                <input type="number" name="stok" class="form-control" required
+                                    value="<%= urun ? urun.stok : '0' %>">
+                            </div>
+                            <div class="form-group">
+                                <label>Min. Sipariş Adedi</label>
+                                <input type="number" name="min_siparis" class="form-control"
+                                    value="<%= urun ? urun.min_siparis || '1' : '1' %>">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>KDV Oranı (%)</label>
+                                <select name="kdv_orani" class="form-control">
+                                    <option value="20" <%=urun && urun.kdv_orani==20 ? 'selected' : '' %>>%20</option>
+                                    <option value="10" <%=urun && urun.kdv_orani==10 ? 'selected' : '' %>>%10</option>
+                                    <option value="1" <%=urun && urun.kdv_orani==1 ? 'selected' : '' %>>%1</option>
+                                    <option value="0" <%=urun && urun.kdv_orani==0 ? 'selected' : '' %>>%0</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Paket Tipi</label>
+                                <select name="paket_tipi" class="form-control">
+                                    <option value="">Seçiniz</option>
+                                    <option value="SMD" <%=urun && urun.paket_tipi==='SMD' ? 'selected' : '' %>>SMD
+                                    </option>
+                                    <option value="DIP" <%=urun && urun.paket_tipi==='DIP' ? 'selected' : '' %>>DIP
+                                    </option>
+                                    <option value="Radial" <%=urun && urun.paket_tipi==='Radial' ? 'selected' : '' %>
+                                        >Radial</option>
+                                    <option value="QFP" <%=urun && urun.paket_tipi==='QFP' ? 'selected' : '' %>>QFP
+                                    </option>
+                                    <option value="BGA" <%=urun && urun.paket_tipi==='BGA' ? 'selected' : '' %>>BGA
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fiyat Kademeleri -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Fiyat Kademeleri (Opsiyonel)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="priceTiers">
+                            <% if (urun && urun.fiyat_kademeleri && urun.fiyat_kademeleri.length> 0) { %>
+                                <% urun.fiyat_kademeleri.forEach((kademe, i)=> { %>
+                                    <div class="price-tier-row">
+                                        <input type="number" name="kademe_min[]" placeholder="Min Adet"
+                                            value="<%= kademe.min_adet %>">
+                                        <input type="number" name="kademe_max[]" placeholder="Max Adet"
+                                            value="<%= kademe.max_adet || '' %>">
+                                        <input type="number" name="kademe_fiyat[]" step="0.01" placeholder="Fiyat"
+                                            value="<%= kademe.fiyat %>">
+                                        <button type="button" class="btn btn-danger btn-sm remove-tier"><i
+                                                class="fas fa-times"></i></button>
+                                    </div>
+                                    <% }) %>
+                                        <% } %>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="addTierBtn">
+                            <i class="fas fa-plus"></i> Kademe Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resimler -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ürün Resimleri</h3>
+                    </div>
+                    <div class="card-body">
+                        <% if (urun && urun.resimler && urun.resimler.length> 0) { %>
+                            <div class="current-images">
+                                <% urun.resimler.forEach(resim=> { %>
+                                    <div class="image-item">
+                                        <img src="<%= resim.resim_url %>" alt="">
+                                        <button type="button" class="remove-image" data-id="<%= resim.id %>">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } %>
+
+                                <div class="image-upload">
+                                    <label for="images" class="upload-area">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Resim yüklemek için tıklayın veya sürükleyin</span>
+                                        <small>PNG, JPG, WEBP - Max 5MB</small>
+                                    </label>
+                                    <input type="file" name="images" id="images" multiple accept="image/*" hidden>
+                                </div>
+                                <div id="imagePreview" class="image-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ: Yan Bilgiler -->
+            <div class="form-sidebar">
+                <!-- Yayın Durumu -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Yayın Durumu</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="switch-label">
+                                <input type="checkbox" name="durum" value="1" <%=!urun || urun.durum ? 'checked' : ''
+                                    %>>
+                                <span class="switch"></span>
+                                <span>Aktif</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="switch-label">
+                                <input type="checkbox" name="one_cikan" value="1" <%=urun && urun.one_cikan ? 'checked'
+                                    : '' %>>
+                                <span class="switch"></span>
+                                <span>Öne Çıkan</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="switch-label">
+                                <input type="checkbox" name="yeni" value="1" <%=urun && urun.yeni ? 'checked' : '' %>>
+                                <span class="switch"></span>
+                                <span>Yeni Ürün</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kategori & Marka -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kategori & Marka</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Kategori *</label>
+                            <select name="kategori_id" class="form-control" required>
+                                <option value="">Seçiniz</option>
+                                <% kategoriler.forEach(kat=> { %>
+                                    <option value="<%= kat.id %>" <%=urun && urun.kategori_id==kat.id ? 'selected' : ''
+                                        %>>
+                                        <%= kat.parent_id ? '— ' : '' %>
+                                            <%= kat.ad %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Marka</label>
+                            <select name="marka_id" class="form-control">
+                                <option value="">Seçiniz</option>
+                                <% markalar.forEach(marka=> { %>
+                                    <option value="<%= marka.id %>" <%=urun && urun.marka_id==marka.id ? 'selected' : ''
+                                        %>>
+                                        <%= marka.ad %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datasheet -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Datasheet</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Datasheet URL</label>
+                            <input type="url" name="datasheet_url" class="form-control" placeholder="https://..."
+                                value="<%= urun ? urun.datasheet_url || '' : '' %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kaydet -->
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-save"></i>
+                    <%= urun ? 'Güncelle' : 'Kaydet' %>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <style>
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .form-main .card {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .editor {
+            min-height: 200px;
+        }
+
+        /* Price Tiers */
+        .price-tier-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 40px;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .price-tier-row input {
+            padding: 10px;
+            background: var(--admin-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            color: var(--admin-text);
+        }
+
+        /* Images */
+        .current-images {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .image-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: var(--admin-bg);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .image-item .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--admin-danger);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed var(--admin-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--admin-primary);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--admin-text-muted);
+            margin-bottom: 12px;
+        }
+
+        .upload-area small {
+            color: var(--admin-text-muted);
+            margin-top: 8px;
+        }
+
+        .image-preview {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* Switch */
+        .switch-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .switch-label input {
+            display: none;
+        }
+
+        .switch {
+            width: 44px;
+            height: 24px;
+            background: var(--admin-border);
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.2s;
+        }
+
+        .switch-label input:checked+.switch {
+            background: var(--admin-success);
+        }
+
+        .switch-label input:checked+.switch::after {
+            left: 23px;
+        }
+
+        @media (max-width: 992px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script>
+        // Add Price Tier
+        document.getElementById('addTierBtn').addEventListener('click', function () {
+            const container = document.getElementById('priceTiers');
+            const row = document.createElement('div');
+            row.className = 'price-tier-row';
+            row.innerHTML = `
+        <input type="number" name="kademe_min[]" placeholder="Min Adet">
+        <input type="number" name="kademe_max[]" placeholder="Max Adet">
+        <input type="number" name="kademe_fiyat[]" step="0.01" placeholder="Fiyat">
+        <button type="button" class="btn btn-danger btn-sm remove-tier"><i class="fas fa-times"></i></button>
+    `;
+            container.appendChild(row);
+        });
+
+        // Remove Price Tier
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-tier')) {
+                e.target.closest('.price-tier-row').remove();
+            }
+        });
+
+        // Image Preview
+        document.getElementById('images').addEventListener('change', function () {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Click to upload
+        document.querySelector('.upload-area').addEventListener('click', function () {
+            document.getElementById('images').click();
+        });
+    </script>

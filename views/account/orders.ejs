@@ -1,0 +1,349 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li><a href="/hesabim">Hesabım</a></li>
+            <li class="active">Siparişlerim</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="account-page">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar -->
+            <%- include('../partials/account-sidebar', { activePage: 'siparislerim' }) %>
+
+                <!-- Content -->
+                <main class="account-content">
+                    <div class="content-header">
+                        <h1>Siparişlerim</h1>
+                    </div>
+
+                    <% if (siparisler && siparisler.length> 0) { %>
+                        <div class="orders-list">
+                            <% siparisler.forEach(siparis=> { %>
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div class="order-info">
+                                            <span class="order-number">#<%= siparis.siparis_no %></span>
+                                            <span class="order-date">
+                                                <%= new Date(siparis.created_at).toLocaleDateString('tr-TR', {
+                                                    day: 'numeric' , month: 'long' , year: 'numeric' }) %>
+                                            </span>
+                                        </div>
+                                        <div class="order-status">
+                                            <% let statusClass='warning' ; let statusText=siparis.siparis_durumu; const
+                                                durumlar={ 'beklemede' : { class: 'warning' , text: 'Beklemede'
+                                                }, 'onaylandi' : { class: 'primary' , text: 'Onaylandı'
+                                                }, 'hazirlaniyor' : { class: 'primary' , text: 'Hazırlanıyor'
+                                                }, 'kargoda' : { class: 'info' , text: 'Kargoda' }, 'teslim_edildi' : {
+                                                class: 'success' , text: 'Teslim Edildi' }, 'iptal' : { class: 'danger'
+                                                , text: 'İptal Edildi' } }; if (durumlar[siparis.siparis_durumu]) {
+                                                statusClass=durumlar[siparis.siparis_durumu].class;
+                                                statusText=durumlar[siparis.siparis_durumu].text; } %>
+                                                <span class="status-badge <%= statusClass %>">
+                                                    <%= statusText %>
+                                                </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="order-products">
+                                        <% if (siparis.urunler && siparis.urunler.length> 0) { %>
+                                            <% siparis.urunler.slice(0, 3).forEach(item=> { %>
+                                                <div class="order-product">
+                                                    <div class="product-image">
+                                                        <% if (item.urun && item.urun.resimler &&
+                                                            item.urun.resimler.length> 0) { %>
+                                                            <img src="<%= item.urun.resimler[0].resim_url %>"
+                                                                alt="<%= item.urun_adi %>">
+                                                            <% } else { %>
+                                                                <img src="/images/no-image.png"
+                                                                    alt="<%= item.urun_adi %>">
+                                                                <% } %>
+                                                    </div>
+                                                    <div class="product-info">
+                                                        <span class="product-name">
+                                                            <%= item.urun_adi %>
+                                                        </span>
+                                                        <span class="product-qty">x<%= item.adet %></span>
+                                                    </div>
+                                                    <span class="product-price">
+                                                        <%= parseFloat(item.toplam_fiyat).toFixed(2).replace('.', ',' )
+                                                            %> ₺
+                                                    </span>
+                                                </div>
+                                                <% }) %>
+                                                    <% if (siparis.urunler.length> 3) { %>
+                                                        <div class="more-products">+<%= siparis.urunler.length - 3 %>
+                                                                ürün daha</div>
+                                                        <% } %>
+                                                            <% } %>
+                                    </div>
+
+                                    <div class="order-footer">
+                                        <div class="order-total">
+                                            <span>Toplam:</span>
+                                            <strong>
+                                                <%= parseFloat(siparis.toplam_tutar).toFixed(2).replace('.', ',' ) %> ₺
+                                            </strong>
+                                        </div>
+                                        <div class="order-actions">
+                                            <% if (siparis.kargo_takip_no) { %>
+                                                <a href="#" class="btn btn-sm btn-secondary track-cargo"
+                                                    data-tracking="<%= siparis.kargo_takip_no %>">
+                                                    <i class="fas fa-truck"></i> Kargo Takip
+                                                </a>
+                                                <% } %>
+                                                    <a href="/siparislerim/<%= siparis.id %>"
+                                                        class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i> Detay
+                                                    </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+
+                        <!-- Sayfalama -->
+                        <% if (toplamSayfa> 1) { %>
+                            <nav class="pagination">
+                                <% for (let i=1; i <=toplamSayfa; i++) { %>
+                                    <a href="?sayfa=<%= i %>"
+                                        class="pagination-btn <%= i === mevcutSayfa ? 'active' : '' %>">
+                                        <%= i %>
+                                    </a>
+                                    <% } %>
+                            </nav>
+                            <% } %>
+                                <% } else { %>
+                                    <div class="no-orders">
+                                        <i class="fas fa-box-open"></i>
+                                        <h3>Henüz Sipariş Yok</h3>
+                                        <p>Henüz bir siparişiniz bulunmuyor.</p>
+                                        <a href="/urunler" class="btn btn-primary">
+                                            <i class="fas fa-shopping-bag"></i> Alışverişe Başla
+                                        </a>
+                                    </div>
+                                    <% } %>
+                </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .order-card {
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .order-number {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .order-date {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-badge.warning {
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--color-warning);
+    }
+
+    .status-badge.primary {
+        background: rgba(59, 130, 246, 0.15);
+        color: var(--color-primary);
+    }
+
+    .status-badge.info {
+        background: rgba(6, 182, 212, 0.15);
+        color: var(--color-info);
+    }
+
+    .status-badge.success {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--color-success);
+    }
+
+    .status-badge.danger {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--color-error);
+    }
+
+    .order-products {
+        padding: 20px;
+    }
+
+    .order-product {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-product:last-child {
+        border-bottom: none;
+    }
+
+    .order-product .product-image {
+        width: 60px;
+        height: 60px;
+        background: var(--bg-card);
+        border-radius: var(--radius-md);
+        padding: 8px;
+    }
+
+    .order-product .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .order-product .product-info {
+        flex: 1;
+    }
+
+    .order-product .product-name {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .order-product .product-qty {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .order-product .product-price {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .more-products {
+        text-align: center;
+        padding: 10px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .order-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .order-total strong {
+        font-size: 1.1rem;
+        color: var(--color-primary);
+        margin-left: 8px;
+    }
+
+    .order-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .no-orders {
+        text-align: center;
+        padding: 60px;
+        background: var(--bg-input);
+        border-radius: var(--radius-lg);
+    }
+
+    .no-orders i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .no-orders h3 {
+        margin-bottom: 10px;
+    }
+
+    .no-orders p {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 30px;
+    }
+
+    .pagination-btn {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        transition: all 0.2s;
+    }
+
+    .pagination-btn:hover,
+    .pagination-btn.active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .order-footer {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .order-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>

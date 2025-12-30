@@ -1,0 +1,508 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li class="active">Sepetim</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="cart-page">
+    <div class="container">
+        <h1 class="page-title">Sepetim</h1>
+
+        <% if (sepetItems && sepetItems.length> 0) { %>
+            <div class="cart-layout">
+                <!-- Sepet Ürünleri -->
+                <div class="cart-items">
+                    <div class="cart-header-row">
+                        <span class="col-product">Ürün</span>
+                        <span class="col-price">Birim Fiyat</span>
+                        <span class="col-quantity">Adet</span>
+                        <span class="col-total">Toplam</span>
+                        <span class="col-action"></span>
+                    </div>
+
+                    <% sepetItems.forEach(item=> { %>
+                        <% const urun=item.urun || item; %>
+                            <div class="cart-item-row" data-product-id="<%= urun.id %>">
+                                <div class="col-product">
+                                    <a href="/urun/<%= urun.slug %>" class="cart-product-image">
+                                        <% if (urun.resimler && urun.resimler.length> 0) { %>
+                                            <img src="<%= urun.resimler[0].resim_url %>" alt="<%= urun.ad %>">
+                                            <% } else { %>
+                                                <img src="/images/no-image.png" alt="<%= urun.ad %>">
+                                                <% } %>
+                                    </a>
+                                    <div class="cart-product-info">
+                                        <a href="/urun/<%= urun.slug %>" class="cart-product-title">
+                                            <%= urun.ad.substring(0, 60) %>
+                                                <%= urun.ad.length> 60 ? '...' : '' %>
+                                        </a>
+                                        <span class="cart-product-pn">
+                                            <%= urun.parca_no %>
+                                        </span>
+                                        <% if (urun.marka) { %>
+                                            <span class="cart-product-brand">
+                                                <%= urun.marka.ad %>
+                                            </span>
+                                            <% } %>
+                                    </div>
+                                </div>
+
+                                <div class="col-price">
+                                    <span class="item-price">
+                                        <%= parseFloat(urun.fiyat).toFixed(2).replace('.', ',' ) %> ₺
+                                    </span>
+                                </div>
+
+                                <div class="col-quantity">
+                                    <div class="quantity-selector">
+                                        <button class="qty-btn minus"
+                                            onclick="updateQuantity(<%= urun.id %>, <%= item.adet - 1 %>)">-</button>
+                                        <input type="number" class="qty-input" value="<%= item.adet %>"
+                                            min="<%= urun.min_siparis || 1 %>"
+                                            onchange="updateQuantity(<%= urun.id %>, this.value)">
+                                        <button class="qty-btn plus"
+                                            onclick="updateQuantity(<%= urun.id %>, <%= item.adet + 1 %>)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="col-total">
+                                    <span class="item-total">
+                                        <%= (parseFloat(urun.fiyat) * item.adet).toFixed(2).replace('.', ',' ) %> ₺
+                                    </span>
+                                </div>
+
+                                <div class="col-action">
+                                    <button class="remove-btn" onclick="removeItem(<%= urun.id %>)" title="Kaldır">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <% }) %>
+                </div>
+
+                <!-- Sipariş Özeti -->
+                <div class="cart-summary">
+                    <div class="summary-card">
+                        <h3>Sipariş Özeti</h3>
+
+                        <div class="summary-row">
+                            <span>Ara Toplam</span>
+                            <span id="subtotal">
+                                <%= araToplam.toFixed(2).replace('.', ',' ) %> ₺
+                            </span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Kargo</span>
+                            <span id="shipping">
+                                <% if (araToplam>= 500) { %>
+                                    <span class="free-shipping">Ücretsiz</span>
+                                    <% } else { %>
+                                        29,90 ₺
+                                        <% } %>
+                            </span>
+                        </div>
+
+                        <% if (araToplam < 500) { %>
+                            <div class="free-shipping-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>
+                                    <%= (500 - araToplam).toFixed(2).replace('.', ',' ) %> ₺ daha ekleyin, kargo
+                                        ücretsiz!
+                                </span>
+                            </div>
+                            <% } %>
+
+                                <div class="summary-row total">
+                                    <span>Genel Toplam</span>
+                                    <span id="grandTotal">
+                                        <% const kargoUcreti=araToplam>= 500 ? 0 : 29.90; %>
+                                            <%= (araToplam + kargoUcreti).toFixed(2).replace('.', ',' ) %> ₺
+                                    </span>
+                                </div>
+
+                                <div class="summary-vat-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    KDV dahil değildir.
+                                </div>
+
+                                <a href="/odeme" class="btn btn-primary btn-block btn-lg">
+                                    Siparişi Tamamla
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+
+                                <a href="/urunler" class="btn btn-secondary btn-block">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Alışverişe Devam Et
+                                </a>
+                    </div>
+
+                    <!-- Kupon Kodu -->
+                    <div class="coupon-card">
+                        <h4><i class="fas fa-ticket-alt"></i> Kupon Kodu</h4>
+                        <form class="coupon-form" id="couponForm">
+                            <input type="text" placeholder="Kupon kodunuz" id="couponCode">
+                            <button type="submit" class="btn btn-secondary">Uygula</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <% } else { %>
+                <!-- Boş Sepet -->
+                <div class="empty-cart">
+                    <div class="empty-cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h2>Sepetiniz Boş</h2>
+                    <p>Henüz sepetinize ürün eklememişsiniz.</p>
+                    <a href="/urunler" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag"></i>
+                        Alışverişe Başla
+                    </a>
+                </div>
+                <% } %>
+    </div>
+</div>
+
+<style>
+    .cart-page {
+        padding: 30px 0 60px;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        margin-bottom: 30px;
+    }
+
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 30px;
+        align-items: start;
+    }
+
+    /* Cart Items */
+    .cart-items {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .cart-header-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 150px 1fr 50px;
+        gap: 16px;
+        padding: 16px 20px;
+        background: var(--bg-input);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    .cart-item-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 150px 1fr 50px;
+        gap: 16px;
+        padding: 20px;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .cart-item-row:last-child {
+        border-bottom: none;
+    }
+
+    .col-product {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .cart-product-image {
+        width: 80px;
+        height: 80px;
+        background: var(--bg-input);
+        border-radius: var(--radius-md);
+        padding: 8px;
+        flex-shrink: 0;
+    }
+
+    .cart-product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .cart-product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .cart-product-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.4;
+    }
+
+    .cart-product-title:hover {
+        color: var(--color-primary);
+    }
+
+    .cart-product-pn {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-family: monospace;
+    }
+
+    .cart-product-brand {
+        font-size: 0.8rem;
+        color: var(--color-primary);
+    }
+
+    .item-price,
+    .item-total {
+        font-weight: 600;
+    }
+
+    .item-total {
+        color: var(--color-primary);
+        font-size: 1.1rem;
+    }
+
+    .remove-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(239, 68, 68, 0.1);
+        border: none;
+        border-radius: var(--radius-md);
+        color: var(--color-error);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .remove-btn:hover {
+        background: var(--color-error);
+        color: white;
+    }
+
+    /* Cart Summary */
+    .cart-summary {
+        position: sticky;
+        top: 160px;
+    }
+
+    .summary-card,
+    .coupon-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+
+    .summary-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        color: var(--text-secondary);
+    }
+
+    .summary-row.total {
+        border-top: 1px solid var(--border-color);
+        margin-top: 12px;
+        padding-top: 20px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .summary-row.total span:last-child {
+        color: var(--color-primary);
+    }
+
+    .free-shipping {
+        color: var(--color-success);
+        font-weight: 500;
+    }
+
+    .free-shipping-info {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--color-primary);
+        margin: 12px 0;
+    }
+
+    .summary-vat-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .summary-card .btn {
+        margin-bottom: 10px;
+    }
+
+    /* Coupon */
+    .coupon-card h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+    }
+
+    .coupon-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .coupon-form input {
+        flex: 1;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+    }
+
+    /* Empty Cart */
+    .empty-cart {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-cart-icon {
+        width: 120px;
+        height: 120px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 2px solid var(--color-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        font-size: 3rem;
+        color: var(--color-primary);
+    }
+
+    .empty-cart h2 {
+        margin-bottom: 10px;
+    }
+
+    .empty-cart p {
+        color: var(--text-muted);
+        margin-bottom: 30px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-summary {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cart-header-row {
+            display: none;
+        }
+
+        .cart-item-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .col-product {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .cart-product-image {
+            width: 100px;
+            height: 100px;
+        }
+    }
+</style>
+
+<script>
+    async function updateQuantity(productId, newQty) {
+        if (newQty < 1) {
+            removeItem(productId);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/sepet/guncelle', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urun_id: productId, adet: newQty })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function removeItem(productId) {
+        if (!confirm('Bu ürünü sepetten kaldırmak istediğinize emin misiniz?')) return;
+
+        try {
+            const response = await fetch(`/api/sepet/sil/${productId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    document.getElementById('couponForm')?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const code = document.getElementById('couponCode').value;
+        if (!code) return;
+
+        // Kupon doğrulama API'si eklenecek
+        alert('Kupon kodu henüz desteklenmiyor.');
+    });
+</script>

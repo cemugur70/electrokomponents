@@ -1,0 +1,800 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li><a href="/sepet">Sepetim</a></li>
+            <li class="active">Ödeme</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="checkout-page">
+    <div class="container">
+        <h1 class="page-title">Ödeme</h1>
+
+        <!-- Checkout Steps -->
+        <div class="checkout-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-text">Adres</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-text">Ödeme</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-text">Onay</span>
+            </div>
+        </div>
+
+        <form id="checkoutForm" action="/odeme/olustur" method="POST">
+            <div class="checkout-layout">
+                <!-- Sol: Form Alanları -->
+                <div class="checkout-form">
+                    <!-- Adım 1: Teslimat Adresi -->
+                    <div class="checkout-section" id="step1">
+                        <h2><i class="fas fa-map-marker-alt"></i> Teslimat Adresi</h2>
+
+                        <% if (adresler && adresler.length> 0) { %>
+                            <div class="address-list">
+                                <% adresler.forEach((adres, index)=> { %>
+                                    <label class="address-card">
+                                        <input type="radio" name="teslimat_adres_id" value="<%= adres.id %>"
+                                            <%=index===0 ? 'checked' : '' %> required>
+                                        <div class="address-card-content">
+                                            <div class="address-header">
+                                                <strong>
+                                                    <%= adres.baslik %>
+                                                </strong>
+                                                <% if (adres.varsayilan) { %>
+                                                    <span class="badge">Varsayılan</span>
+                                                    <% } %>
+                                            </div>
+                                            <p>
+                                                <%= adres.ad %>
+                                                    <%= adres.soyad %>
+                                            </p>
+                                            <p>
+                                                <%= adres.acik_adres %>
+                                            </p>
+                                            <p>
+                                                <%= adres.ilce %> / <%= adres.il %>
+                                            </p>
+                                            <p>
+                                                <%= adres.telefon %>
+                                            </p>
+                                        </div>
+                                    </label>
+                                    <% }) %>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" id="addNewAddressBtn">
+                                <i class="fas fa-plus"></i> Yeni Adres Ekle
+                            </button>
+                            <% } else { %>
+                                <p class="no-address-msg">Kayıtlı adresiniz bulunmuyor. Lütfen yeni adres ekleyin.</p>
+                                <% } %>
+
+                                    <!-- Yeni Adres Formu -->
+                                    <div class="new-address-form <%= adresler && adresler.length > 0 ? '' : 'active' %>"
+                                        id="newAddressForm">
+                                        <h3>Yeni Adres</h3>
+
+                                        <div class="form-group">
+                                            <label>Adres Başlığı *</label>
+                                            <input type="text" name="adres_baslik" class="form-control"
+                                                placeholder="Örn: Ev, İş">
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Ad *</label>
+                                                <input type="text" name="adres_ad" class="form-control"
+                                                    value="<%= user.ad %>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Soyad *</label>
+                                                <input type="text" name="adres_soyad" class="form-control"
+                                                    value="<%= user.soyad %>">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Telefon *</label>
+                                            <input type="tel" name="adres_telefon" class="form-control"
+                                                value="<%= user.telefon || '' %>">
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>İl *</label>
+                                                <select name="adres_il" class="form-control" id="ilSelect">
+                                                    <option value="">Seçiniz</option>
+                                                    <option value="İstanbul">İstanbul</option>
+                                                    <option value="Ankara">Ankara</option>
+                                                    <option value="İzmir">İzmir</option>
+                                                    <option value="Bursa">Bursa</option>
+                                                    <option value="Antalya">Antalya</option>
+                                                    <!-- Diğer iller eklenecek -->
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>İlçe *</label>
+                                                <input type="text" name="adres_ilce" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Açık Adres *</label>
+                                            <textarea name="adres_acik" class="form-control" rows="3"
+                                                placeholder="Mahalle, cadde, sokak, bina no, daire no"></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Posta Kodu</label>
+                                            <input type="text" name="adres_posta_kodu" class="form-control">
+                                        </div>
+                                    </div>
+
+                                    <!-- Fatura Adresi -->
+                                    <div class="billing-address-section">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="sameBillingAddress" name="ayni_fatura_adresi"
+                                                checked>
+                                            <span class="checkmark"></span>
+                                            Fatura adresi teslimat adresi ile aynı
+                                        </label>
+                                    </div>
+
+                                    <div class="step-buttons">
+                                        <a href="/sepet" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left"></i> Sepete Dön
+                                        </a>
+                                        <button type="button" class="btn btn-primary" onclick="goToStep(2)">
+                                            Ödemeye Geç <i class="fas fa-arrow-right"></i>
+                                        </button>
+                                    </div>
+                    </div>
+
+                    <!-- Adım 2: Ödeme -->
+                    <div class="checkout-section hidden" id="step2">
+                        <h2><i class="fas fa-credit-card"></i> Ödeme Yöntemi</h2>
+
+                        <div class="payment-methods">
+                            <label class="payment-method">
+                                <input type="radio" name="odeme_yontemi" value="kredi_karti" checked>
+                                <div class="payment-method-content">
+                                    <i class="fas fa-credit-card"></i>
+                                    <div class="payment-info">
+                                        <strong>Kredi / Banka Kartı</strong>
+                                        <span>iyzico güvencesiyle güvenli ödeme</span>
+                                    </div>
+                                    <div class="payment-logos">
+                                        <img src="/images/payment-visa.svg" alt="Visa">
+                                        <img src="/images/payment-mastercard.svg" alt="Mastercard">
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="payment-method">
+                                <input type="radio" name="odeme_yontemi" value="havale">
+                                <div class="payment-method-content">
+                                    <i class="fas fa-university"></i>
+                                    <div class="payment-info">
+                                        <strong>Havale / EFT</strong>
+                                        <span>Banka havalesi ile ödeme</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- iyzico Checkout Form buraya yüklenecek -->
+                        <div id="iyzicoForm"></div>
+
+                        <div class="step-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">
+                                <i class="fas fa-arrow-left"></i> Geri
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg" id="completeOrderBtn">
+                                <i class="fas fa-lock"></i> Siparişi Tamamla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sağ: Sipariş Özeti -->
+                <div class="checkout-summary">
+                    <div class="summary-card">
+                        <h3>Sipariş Özeti</h3>
+
+                        <div class="summary-products">
+                            <% sepetItems.forEach(item=> { %>
+                                <% const urun=item.urun || item; %>
+                                    <div class="summary-product">
+                                        <div class="product-thumb">
+                                            <% if (urun.resimler && urun.resimler.length> 0) { %>
+                                                <img src="<%= urun.resimler[0].resim_url %>" alt="<%= urun.ad %>">
+                                                <% } else { %>
+                                                    <img src="/images/no-image.png" alt="<%= urun.ad %>">
+                                                    <% } %>
+                                                        <span class="qty-badge">
+                                                            <%= item.adet %>
+                                                        </span>
+                                        </div>
+                                        <div class="product-info">
+                                            <span class="product-name">
+                                                <%= urun.ad.substring(0, 40) %>
+                                                    <%= urun.ad.length> 40 ? '...' : '' %>
+                                            </span>
+                                            <span class="product-pn">
+                                                <%= urun.parca_no %>
+                                            </span>
+                                        </div>
+                                        <span class="product-price">
+                                            <%= (parseFloat(urun.fiyat) * item.adet).toFixed(2).replace('.', ',' ) %> ₺
+                                        </span>
+                                    </div>
+                                    <% }) %>
+                        </div>
+
+                        <div class="summary-totals">
+                            <div class="summary-row">
+                                <span>Ara Toplam</span>
+                                <span>
+                                    <%= araToplam.toFixed(2).replace('.', ',' ) %> ₺
+                                </span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Kargo</span>
+                                <span>
+                                    <% if (araToplam>= 500) { %>
+                                        <span class="free">Ücretsiz</span>
+                                        <% } else { %>
+                                            29,90 ₺
+                                            <% } %>
+                                </span>
+                            </div>
+                            <div class="summary-row">
+                                <span>KDV (%20)</span>
+                                <span>
+                                    <%= (araToplam * 0.20).toFixed(2).replace('.', ',' ) %> ₺
+                                </span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Toplam</span>
+                                <span>
+                                    <% const kargoUcreti=araToplam>= 500 ? 0 : 29.90; %>
+                                        <% const kdv=araToplam * 0.20; %>
+                                            <%= (araToplam + kargoUcreti + kdv).toFixed(2).replace('.', ',' ) %> ₺
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Güvenlik Bilgisi -->
+                    <div class="security-info">
+                        <div class="security-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>256-bit SSL ile güvenli ödeme</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-lock"></i>
+                            <span>iyzico güvencesiyle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .checkout-page {
+        padding: 30px 0 60px;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        margin-bottom: 30px;
+    }
+
+    /* Checkout Steps */
+    .checkout-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+    }
+
+    .step.active {
+        color: var(--color-primary);
+    }
+
+    .step.completed {
+        color: var(--color-success);
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border: 2px solid currentColor;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .step.active .step-number,
+    .step.completed .step-number {
+        background: currentColor;
+        color: white;
+    }
+
+    .step-line {
+        width: 100px;
+        height: 2px;
+        background: var(--border-color);
+        margin: 0 20px;
+    }
+
+    /* Checkout Layout */
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+        align-items: start;
+    }
+
+    .checkout-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+    }
+
+    .checkout-section.hidden {
+        display: none;
+    }
+
+    .checkout-section h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.25rem;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Address List */
+    .address-list {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .address-card {
+        cursor: pointer;
+    }
+
+    .address-card input {
+        display: none;
+    }
+
+    .address-card-content {
+        padding: 20px;
+        background: var(--bg-input);
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        transition: all 0.2s;
+    }
+
+    .address-card input:checked+.address-card-content {
+        border-color: var(--color-primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .address-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .address-header .badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        background: var(--color-primary);
+        color: white;
+        border-radius: 20px;
+    }
+
+    .address-card-content p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin: 4px 0;
+    }
+
+    .no-address-msg {
+        padding: 20px;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: var(--radius-md);
+        color: var(--color-warning);
+        margin-bottom: 20px;
+    }
+
+    /* New Address Form */
+    .new-address-form {
+        display: none;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .new-address-form.active {
+        display: block;
+    }
+
+    .new-address-form h3 {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    /* Payment Methods */
+    .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .payment-method {
+        cursor: pointer;
+    }
+
+    .payment-method input {
+        display: none;
+    }
+
+    .payment-method-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        background: var(--bg-input);
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-md);
+        transition: all 0.2s;
+    }
+
+    .payment-method input:checked+.payment-method-content {
+        border-color: var(--color-primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .payment-method-content>i {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        width: 40px;
+    }
+
+    .payment-info {
+        flex: 1;
+    }
+
+    .payment-info strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .payment-info span {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .payment-logos {
+        display: flex;
+        gap: 8px;
+    }
+
+    .payment-logos img {
+        height: 24px;
+    }
+
+    /* Step Buttons */
+    .step-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    /* Summary */
+    .summary-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        position: sticky;
+        top: 160px;
+    }
+
+    .summary-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .summary-products {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+
+    .summary-product {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .summary-product:last-child {
+        border-bottom: none;
+    }
+
+    .product-thumb {
+        width: 50px;
+        height: 50px;
+        background: var(--bg-input);
+        border-radius: var(--radius-sm);
+        padding: 4px;
+        position: relative;
+    }
+
+    .product-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .qty-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        background: var(--color-primary);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .summary-product .product-info {
+        flex: 1;
+    }
+
+    .summary-product .product-name {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .summary-product .product-pn {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .summary-product .product-price {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .summary-totals {
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        color: var(--text-secondary);
+    }
+
+    .summary-row.total {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        padding-top: 16px;
+        margin-top: 8px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .summary-row.total span:last-child {
+        color: var(--color-primary);
+    }
+
+    .summary-row .free {
+        color: var(--color-success);
+    }
+
+    /* Security Info */
+    .security-info {
+        margin-top: 20px;
+        padding: 16px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: var(--radius-md);
+    }
+
+    .security-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--color-success);
+        margin-bottom: 8px;
+    }
+
+    .security-item:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Form Elements */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary);
+    }
+
+    .billing-address-section {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .checkout-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .checkout-steps {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .step-line {
+            display: none;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .step-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .step-buttons .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    let currentStep = 1;
+
+    function goToStep(step) {
+        // Validation
+        if (step === 2 && currentStep === 1) {
+            const selectedAddress = document.querySelector('input[name="teslimat_adres_id"]:checked');
+            const newAddressForm = document.getElementById('newAddressForm');
+
+            if (!selectedAddress && !newAddressForm.classList.contains('active')) {
+                alert('Lütfen bir teslimat adresi seçin veya yeni adres ekleyin.');
+                return;
+            }
+        }
+
+        // Hide all sections
+        document.querySelectorAll('.checkout-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+
+        // Show target section
+        document.getElementById('step' + step).classList.remove('hidden');
+
+        // Update step indicators
+        document.querySelectorAll('.step').forEach((stepEl, index) => {
+            stepEl.classList.remove('active', 'completed');
+            if (index + 1 < step) {
+                stepEl.classList.add('completed');
+            } else if (index + 1 === step) {
+                stepEl.classList.add('active');
+            }
+        });
+
+        currentStep = step;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // New Address Toggle
+    document.getElementById('addNewAddressBtn')?.addEventListener('click', function () {
+        document.getElementById('newAddressForm').classList.toggle('active');
+    });
+
+    // Form Submit
+    document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+        // Validate before submit
+        const selectedAddress = document.querySelector('input[name="teslimat_adres_id"]:checked');
+        const newAddressActive = document.getElementById('newAddressForm').classList.contains('active');
+
+        if (!selectedAddress && !newAddressActive) {
+            e.preventDefault();
+            alert('Lütfen bir teslimat adresi seçin.');
+            goToStep(1);
+            return;
+        }
+
+        // Show loading state
+        const btn = document.getElementById('completeOrderBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+    });
+</script>

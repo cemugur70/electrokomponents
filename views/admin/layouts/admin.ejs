@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= typeof title !=='undefined' ? title : 'Admin Panel - ElectroKomponents' %>
+    </title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="admin-body">
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <a href="/admin" class="sidebar-logo">
+                    <i class="fas fa-microchip"></i>
+                    <span>ElectroKomponents</span>
+                </a>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="/admin"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">Katalog</li>
+
+                    <li class="nav-item">
+                        <a href="/admin/urunler"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'urunler' ? 'active' : '' %>">
+                            <i class="fas fa-box"></i>
+                            <span>Ürünler</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/kategoriler"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'kategoriler' ? 'active' : '' %>">
+                            <i class="fas fa-folder-tree"></i>
+                            <span>Kategoriler</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/markalar"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'markalar' ? 'active' : '' %>">
+                            <i class="fas fa-tag"></i>
+                            <span>Markalar</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">Satışlar</li>
+
+                    <li class="nav-item">
+                        <a href="/admin/siparisler"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'siparisler' ? 'active' : '' %>">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Siparişler</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">Kullanıcılar</li>
+
+                    <li class="nav-item">
+                        <a href="/admin/musteriler"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'musteriler' ? 'active' : '' %>">
+                            <i class="fas fa-users"></i>
+                            <span>Müşteriler</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">İçerik</li>
+
+                    <li class="nav-item">
+                        <a href="/admin/slider"
+                            class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'slider' ? 'active' : '' %>">
+                            <i class="fas fa-images"></i>
+                            <span>Slider</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">Sistem</li>
+
+                    <li class="nav-item">
+                        <a href="/admin/ayarlar" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Ayarlar</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="/" target="_blank" class="sidebar-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Siteyi Görüntüle</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <a href="/admin">Admin</a>
+                        <% if (typeof breadcrumb !=='undefined' ) { %>
+                            <% breadcrumb.forEach(item=> { %>
+                                <i class="fas fa-chevron-right"></i>
+                                <% if (item.url) { %>
+                                    <a href="<%= item.url %>">
+                                        <%= item.text %>
+                                    </a>
+                                    <% } else { %>
+                                        <span>
+                                            <%= item.text %>
+                                        </span>
+                                        <% } %>
+                                            <% }) %>
+                                                <% } %>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-user">
+                        <span>
+                            <%= user.ad %>
+                                <%= user.soyad %>
+                        </span>
+                        <div class="user-dropdown">
+                            <button class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="/hesabim"><i class="fas fa-user-circle"></i> Profilim</a>
+                                <a href="/auth/cikis"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Flash Messages -->
+            <% if (typeof success_msg !=='undefined' && success_msg.length> 0) { %>
+                <div class="admin-alert success">
+                    <i class="fas fa-check-circle"></i>
+                    <%= success_msg %>
+                        <button class="alert-close"><i class="fas fa-times"></i></button>
+                </div>
+                <% } %>
+
+                    <% if (typeof error_msg !=='undefined' && error_msg.length> 0) { %>
+                        <div class="admin-alert error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <%= error_msg %>
+                                <button class="alert-close"><i class="fas fa-times"></i></button>
+                        </div>
+                        <% } %>
+
+                            <!-- Page Content -->
+                            <div class="admin-content">
+                                <%- body %>
+                            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.getElementById('adminSidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+
+        // Alert Close
+        document.querySelectorAll('.alert-close').forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.closest('.admin-alert').remove();
+            });
+        });
+
+        // Dropdown Toggle
+        document.querySelectorAll('.user-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', function (e) {
+                e.stopPropagation();
+                this.classList.toggle('open');
+            });
+        });
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.user-dropdown').forEach(d => d.classList.remove('open'));
+        });
+    </script>
+</body>
+
+</html>

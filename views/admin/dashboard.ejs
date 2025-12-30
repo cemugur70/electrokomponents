@@ -1,0 +1,235 @@
+<% locals.currentPage='dashboard' %>
+
+    <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <span class="text-muted">Hoş geldiniz, <%= user.ad %>!</span>
+    </div>
+
+    <!-- İstatistik Kartları -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= stats.bugunkuSiparisler || 0 %>
+                </h3>
+                <p>Bugünkü Siparişler</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-lira-sign"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= parseFloat(stats.bugunkuSatis || 0).toFixed(2).replace('.', ',' ) %> ₺
+                </h3>
+                <p>Bugünkü Satış</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= stats.toplamMusteri || 0 %>
+                </h3>
+                <p>Toplam Müşteri</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= stats.stokUyarisi || 0 %>
+                </h3>
+                <p>Stok Uyarısı</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <!-- Satış Grafiği -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Son 7 Günlük Satışlar</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Son Siparişler -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Son Siparişler</h3>
+                <a href="/admin/siparisler" class="btn btn-sm btn-secondary">Tümünü Gör</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Sipariş No</th>
+                                <th>Müşteri</th>
+                                <th>Tutar</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (sonSiparisler && sonSiparisler.length> 0) { %>
+                                <% sonSiparisler.slice(0, 5).forEach(siparis=> { %>
+                                    <tr>
+                                        <td>
+                                            <a href="/admin/siparisler/<%= siparis.id %>"
+                                                style="color: var(--admin-primary);">
+                                                #<%= siparis.siparis_no %>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <% if (siparis.kullanici) { %>
+                                                <%= siparis.kullanici.ad %>
+                                                    <%= siparis.kullanici.soyad %>
+                                                        <% } else { %>
+                                                            -
+                                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <%= parseFloat(siparis.toplam_tutar).toFixed(2).replace('.', ',' ) %> ₺
+                                        </td>
+                                        <td>
+                                            <% let badgeClass='badge-warning' ; let durumText=siparis.siparis_durumu; if
+                                                (siparis.siparis_durumu==='onaylandi' ) badgeClass='badge-primary' ; if
+                                                (siparis.siparis_durumu==='hazirlaniyor' ) badgeClass='badge-primary' ;
+                                                if (siparis.siparis_durumu==='kargoda' ) badgeClass='badge-primary' ; if
+                                                (siparis.siparis_durumu==='teslim_edildi' ) badgeClass='badge-success' ;
+                                                if (siparis.siparis_durumu==='iptal' ) badgeClass='badge-danger' ; const
+                                                durumlar={ 'beklemede' : 'Beklemede' , 'onaylandi' : 'Onaylandı'
+                                                , 'hazirlaniyor' : 'Hazırlanıyor' , 'kargoda' : 'Kargoda'
+                                                , 'teslim_edildi' : 'Teslim Edildi' , 'iptal' : 'İptal' };
+                                                durumText=durumlar[siparis.siparis_durumu] || siparis.siparis_durumu; %>
+                                                <span class="badge <%= badgeClass %>">
+                                                    <%= durumText %>
+                                                </span>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="4"
+                                                    style="text-align: center; color: var(--admin-text-muted);">
+                                                    Henüz sipariş bulunmuyor.
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hızlı Erişim -->
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+            <h3 class="card-title">Hızlı Erişim</h3>
+        </div>
+        <div class="card-body">
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <a href="/admin/urunler/ekle" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Yeni Ürün Ekle
+                </a>
+                <a href="/admin/kategoriler/ekle" class="btn btn-secondary">
+                    <i class="fas fa-folder-plus"></i> Yeni Kategori
+                </a>
+                <a href="/admin/markalar" class="btn btn-secondary">
+                    <i class="fas fa-tag"></i> Marka Ekle
+                </a>
+                <a href="/admin/slider" class="btn btn-secondary">
+                    <i class="fas fa-images"></i> Slider Düzenle
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Satış Grafiği
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartData = <%= JSON.stringify(gunlukSatislar || []) %>;
+
+            const labels = chartData.map(item => {
+                const date = new Date(item.tarih);
+                return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+            });
+
+            const salesData = chartData.map(item => parseFloat(item.toplam) || 0);
+            const ordersData = chartData.map(item => parseInt(item.adet) || 0);
+
+            // Son 7 gün için varsayılan veriler
+            if (labels.length === 0) {
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }));
+                    salesData.push(0);
+                    ordersData.push(0);
+                }
+            }
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Satış (₺)',
+                        data: salesData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function (value) {
+                                    return value.toLocaleString('tr-TR') + ' ₺';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>

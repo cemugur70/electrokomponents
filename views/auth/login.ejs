@@ -1,0 +1,483 @@
+<!-- Login Page -->
+<div class="auth-wrapper">
+    <!-- Sol Panel - Görsel -->
+    <div class="auth-visual">
+        <div class="auth-visual-content">
+            <div class="auth-logo">
+                <span class="logo-icon"><i class="fas fa-microchip"></i></span>
+                <span class="logo-text">Electro<strong>Komponents</strong></span>
+            </div>
+            <h1>Endüstriyel Çözüm Ortağınız</h1>
+            <p>50.000'den fazla elektronik komponent, hızlı teslimat ve teknik destek ile projelerinize güç katın.</p>
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Orijinal & Garantili Ürünler</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Aynı Gün Kargo</span>
+                </div>
+                <div class="auth-feature">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Teknik Destek Hattı</span>
+                </div>
+            </div>
+        </div>
+        <div class="auth-visual-overlay"></div>
+    </div>
+
+    <!-- Sağ Panel - Form -->
+    <div class="auth-form-panel">
+        <div class="auth-form-content">
+            <div class="auth-header">
+                <h2>Giriş Yap</h2>
+                <p>Hesabınıza giriş yaparak alışverişe devam edin.</p>
+            </div>
+
+            <!-- Hata Mesajları -->
+            <% if (typeof errors !=='undefined' && errors.length> 0) { %>
+                <div class="auth-alert error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <ul>
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <% if (typeof error_msg !=='undefined' && error_msg) { %>
+                        <div class="auth-alert error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>
+                                <%= error_msg %>
+                            </span>
+                        </div>
+                        <% } %>
+
+                            <form action="/auth/giris" method="POST" class="auth-form">
+                                <div class="form-group">
+                                    <label for="email">E-posta Adresi</label>
+                                    <div class="input-group">
+                                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" id="email" name="email" placeholder="ornek@email.com"
+                                            value="<%= typeof email !== 'undefined' ? email : '' %>" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="sifre">Şifre</label>
+                                    <div class="input-group">
+                                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                        <input type="password" id="sifre" name="sifre" placeholder="••••••••" required>
+                                        <button type="button" class="toggle-password" data-target="sifre">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="beniHatirla">
+                                        <span class="checkmark"></span>
+                                        Beni Hatırla
+                                    </label>
+                                    <a href="/auth/sifremi-unuttum" class="forgot-link">Şifremi Unuttum</a>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    Giriş Yap
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </form>
+
+                            <div class="auth-divider">
+                                <span>veya</span>
+                            </div>
+
+                            <div class="social-auth">
+                                <button class="btn-social btn-google">
+                                    <i class="fab fa-google"></i>
+                                    Google ile Giriş Yap
+                                </button>
+                            </div>
+
+                            <div class="auth-footer">
+                                <p>Henüz hesabınız yok mu? <a href="/auth/kayit">Kayıt Ol</a></p>
+                            </div>
+
+                            <div class="security-note">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>256-bit SSL ile güvenli bağlantı</span>
+                            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Auth Page Styles */
+    .auth-page {
+        min-height: 100vh;
+        background: var(--bg-dark);
+    }
+
+    .auth-container {
+        min-height: 100vh;
+    }
+
+    .auth-wrapper {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* Visual Panel */
+    .auth-visual {
+        flex: 1;
+        background: url('/images/auth-bg.jpg') center / cover no-repeat;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+    }
+
+    .auth-visual-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(10, 22, 40, 0.95) 0%, rgba(59, 130, 246, 0.3) 100%);
+    }
+
+    .auth-visual-content {
+        position: relative;
+        z-index: 1;
+        max-width: 500px;
+    }
+
+    .auth-visual .auth-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+    }
+
+    .auth-visual h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+
+    .auth-visual p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+
+    .auth-features {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .auth-feature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1rem;
+    }
+
+    .auth-feature i {
+        color: var(--color-success);
+        font-size: 1.2rem;
+    }
+
+    /* Form Panel */
+    .auth-form-panel {
+        width: 550px;
+        background: var(--bg-card);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+    }
+
+    .auth-form-content {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .auth-header {
+        margin-bottom: 32px;
+    }
+
+    .auth-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .auth-header p {
+        color: var(--text-secondary);
+    }
+
+    /* Auth Alert */
+    .auth-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        border-radius: var(--radius-md);
+        margin-bottom: 24px;
+    }
+
+    .auth-alert.error {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--color-error);
+    }
+
+    .auth-alert ul {
+        margin: 0;
+    }
+
+    .auth-alert li {
+        margin-bottom: 4px;
+    }
+
+    /* Form */
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        color: var(--text-muted);
+        z-index: 1;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 14px 16px 14px 48px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all var(--transition-normal);
+    }
+
+    .input-group input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .input-group input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 16px;
+        color: var(--text-muted);
+        transition: color var(--transition-fast);
+    }
+
+    .toggle-password:hover {
+        color: var(--color-primary);
+    }
+
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Checkbox */
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .checkbox-label input {
+        display: none;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        position: relative;
+        transition: all var(--transition-fast);
+    }
+
+    .checkbox-label input:checked+.checkmark {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .checkmark::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        opacity: 0;
+    }
+
+    .checkbox-label input:checked+.checkmark::after {
+        opacity: 1;
+    }
+
+    .forgot-link {
+        font-size: 0.9rem;
+        color: var(--color-primary);
+        transition: color var(--transition-fast);
+    }
+
+    .forgot-link:hover {
+        color: var(--color-primary-light);
+    }
+
+    /* Divider */
+    .auth-divider {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    .auth-divider span {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    /* Social Auth */
+    .btn-social {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        transition: all var(--transition-normal);
+    }
+
+    .btn-google {
+        background: white;
+        color: #333;
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-google:hover {
+        background: #f5f5f5;
+    }
+
+    /* Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 24px;
+        color: var(--text-secondary);
+    }
+
+    .auth-footer a {
+        color: var(--color-primary);
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 32px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .security-note i {
+        color: var(--color-success);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .auth-visual {
+            display: none;
+        }
+
+        .auth-form-panel {
+            width: 100%;
+            padding: 40px 20px;
+        }
+    }
+</style>
+
+<script>
+    // Toggle Password Visibility
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+</script>

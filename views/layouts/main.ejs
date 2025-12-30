@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ElectroKomponents - Elektronik Komponent E-Ticaret Platformu">
+    <title><%= typeof title !== 'undefined' ? title : 'ElectroKomponents' %></title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Ana CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    
+    <%- typeof extraStyles !== 'undefined' ? extraStyles : '' %>
+</head>
+<body>
+    <!-- Header -->
+    <%- include('../partials/header') %>
+    
+    <!-- Flash Mesajları -->
+    <% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <%= success_msg %>
+            <button class="alert-close"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+    
+    <% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <%= error_msg %>
+            <button class="alert-close"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+    
+    <!-- Ana İçerik -->
+    <main class="main-content">
+        <%- body %>
+    </main>
+    
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+    
+    <!-- Sepet Drawer -->
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-drawer-header">
+            <h3><i class="fas fa-shopping-cart"></i> Sepetim</h3>
+            <button class="cart-drawer-close" id="closeCartDrawer">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-drawer-content" id="cartDrawerContent">
+            <!-- AJAX ile doldurulacak -->
+        </div>
+        <div class="cart-drawer-footer">
+            <div class="cart-total">
+                <span>Toplam:</span>
+                <strong id="cartDrawerTotal">0,00 ₺</strong>
+            </div>
+            <a href="/sepet" class="btn btn-primary btn-block">Sepete Git</a>
+        </div>
+    </div>
+    <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
+    
+    <!-- JavaScript -->
+    <script src="/js/main.js"></script>
+    
+    <%- typeof extraScripts !== 'undefined' ? extraScripts : '' %>
+</body>
+</html>

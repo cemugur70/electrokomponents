@@ -1,0 +1,461 @@
+<% locals.currentPage='siparisler' %>
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Sipariş #<%= siparis.siparis_no %>
+            </h1>
+            <span class="order-date">
+                <%= new Date(siparis.created_at).toLocaleDateString('tr-TR', { day: 'numeric' , month: 'long' ,
+                    year: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
+            </span>
+        </div>
+        <a href="/admin/siparisler" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri
+        </a>
+    </div>
+
+    <div class="order-detail-layout">
+        <!-- Sol: Sipariş Detayları -->
+        <div class="order-main">
+            <!-- Durum Güncelleme -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sipariş Durumu</h3>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/siparisler/<%= siparis.id %>/durum-guncelle" method="POST" class="status-form">
+                        <div class="status-row">
+                            <div class="form-group">
+                                <label>Sipariş Durumu</label>
+                                <select name="siparis_durumu" class="form-control">
+                                    <option value="beklemede" <%=siparis.siparis_durumu==='beklemede' ? 'selected' : ''
+                                        %>>Beklemede</option>
+                                    <option value="onaylandi" <%=siparis.siparis_durumu==='onaylandi' ? 'selected' : ''
+                                        %>>Onaylandı</option>
+                                    <option value="hazirlaniyor" <%=siparis.siparis_durumu==='hazirlaniyor' ? 'selected'
+                                        : '' %>>Hazırlanıyor</option>
+                                    <option value="kargoda" <%=siparis.siparis_durumu==='kargoda' ? 'selected' : '' %>
+                                        >Kargoda</option>
+                                    <option value="teslim_edildi" <%=siparis.siparis_durumu==='teslim_edildi'
+                                        ? 'selected' : '' %>>Teslim Edildi</option>
+                                    <option value="iptal" <%=siparis.siparis_durumu==='iptal' ? 'selected' : '' %>>İptal
+                                        Edildi</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kargo Firması</label>
+                                <select name="kargo_firmasi" class="form-control">
+                                    <option value="">Seçiniz</option>
+                                    <option value="yurtici" <%=siparis.kargo_firmasi==='yurtici' ? 'selected' : '' %>
+                                        >Yurtiçi Kargo</option>
+                                    <option value="mng" <%=siparis.kargo_firmasi==='mng' ? 'selected' : '' %>>MNG Kargo
+                                    </option>
+                                    <option value="aras" <%=siparis.kargo_firmasi==='aras' ? 'selected' : '' %>>Aras
+                                        Kargo</option>
+                                    <option value="ptt" <%=siparis.kargo_firmasi==='ptt' ? 'selected' : '' %>>PTT Kargo
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kargo Takip No</label>
+                                <input type="text" name="kargo_takip_no" class="form-control"
+                                    value="<%= siparis.kargo_takip_no || '' %>" placeholder="Takip numarası">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Güncelle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sipariş Ürünleri -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sipariş Ürünleri (<%= siparis.urunler.length %>)</h3>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Ürün</th>
+                                <th>Parça No</th>
+                                <th>Birim Fiyat</th>
+                                <th>Adet</th>
+                                <th>Toplam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% siparis.urunler.forEach(item=> { %>
+                                <tr>
+                                    <td>
+                                        <div class="product-cell">
+                                            <div class="product-thumb">
+                                                <% if (item.urun && item.urun.resimler && item.urun.resimler.length> 0)
+                                                    { %>
+                                                    <img src="<%= item.urun.resimler[0].resim_url %>" alt="">
+                                                    <% } else { %>
+                                                        <img src="/images/no-image.png" alt="">
+                                                        <% } %>
+                                            </div>
+                                            <span>
+                                                <%= item.urun_adi %>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td><code><%= item.parca_no %></code></td>
+                                    <td>
+                                        <%= parseFloat(item.birim_fiyat).toFixed(2).replace('.', ',' ) %> ₺
+                                    </td>
+                                    <td>
+                                        <%= item.adet %>
+                                    </td>
+                                    <td><strong>
+                                            <%= parseFloat(item.toplam_fiyat).toFixed(2).replace('.', ',' ) %> ₺
+                                        </strong></td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" style="text-align: right;"><strong>Ara Toplam:</strong></td>
+                                <td><strong>
+                                        <%= parseFloat(siparis.ara_toplam).toFixed(2).replace('.', ',' ) %> ₺
+                                    </strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="text-align: right;">Kargo:</td>
+                                <td>
+                                    <%= parseFloat(siparis.kargo_ucreti).toFixed(2).replace('.', ',' ) %> ₺
+                                </td>
+                            </tr>
+                            <% if (siparis.indirim_tutari> 0) { %>
+                                <tr>
+                                    <td colspan="4" style="text-align: right; color: var(--admin-success);">İndirim:
+                                    </td>
+                                    <td style="color: var(--admin-success);">-<%=
+                                            parseFloat(siparis.indirim_tutari).toFixed(2).replace('.', ',' ) %> ₺</td>
+                                </tr>
+                                <% } %>
+                                    <tr>
+                                        <td colspan="4" style="text-align: right;"><strong>Genel Toplam:</strong></td>
+                                        <td><strong style="font-size: 1.25rem; color: var(--admin-primary);">
+                                                <%= parseFloat(siparis.toplam_tutar).toFixed(2).replace('.', ',' ) %> ₺
+                                            </strong></td>
+                                    </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sipariş Notları -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sipariş Notları</h3>
+                </div>
+                <div class="card-body">
+                    <% if (siparis.notlar) { %>
+                        <p>
+                            <%= siparis.notlar %>
+                        </p>
+                        <% } else { %>
+                            <p class="text-muted">Sipariş notu bulunmuyor.</p>
+                            <% } %>
+
+                                <form action="/admin/siparisler/<%= siparis.id %>/not-ekle" method="POST"
+                                    style="margin-top: 16px;">
+                                    <div class="form-group">
+                                        <textarea name="not" class="form-control" rows="2"
+                                            placeholder="Yeni not ekle..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-plus"></i> Not Ekle
+                                    </button>
+                                </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ: Müşteri & Adres Bilgileri -->
+        <div class="order-sidebar">
+            <!-- Müşteri Bilgileri -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Müşteri Bilgileri</h3>
+                </div>
+                <div class="card-body">
+                    <% if (siparis.kullanici) { %>
+                        <div class="customer-detail">
+                            <div class="customer-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="customer-info">
+                                <h4>
+                                    <%= siparis.kullanici.ad %>
+                                        <%= siparis.kullanici.soyad %>
+                                </h4>
+                                <p>
+                                    <%= siparis.kullanici.email %>
+                                </p>
+                                <% if (siparis.kullanici.telefon) { %>
+                                    <p>
+                                        <%= siparis.kullanici.telefon %>
+                                    </p>
+                                    <% } %>
+                                        <% if (siparis.kullanici.uyelik_tipi==='kurumsal' ) { %>
+                                            <span class="badge badge-primary">Kurumsal</span>
+                                            <p style="margin-top: 8px;"><strong>
+                                                    <%= siparis.kullanici.firma_adi %>
+                                                </strong></p>
+                                            <% } %>
+                            </div>
+                        </div>
+                        <a href="/admin/musteriler/<%= siparis.kullanici.id %>"
+                            class="btn btn-secondary btn-sm btn-block" style="margin-top: 16px;">
+                            <i class="fas fa-user"></i> Müşteri Profilini Görüntüle
+                        </a>
+                        <% } else { %>
+                            <p class="text-muted">Misafir sipariş</p>
+                            <% } %>
+                </div>
+            </div>
+
+            <!-- Teslimat Adresi -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Teslimat Adresi</h3>
+                </div>
+                <div class="card-body">
+                    <% if (siparis.teslimat_adresi) { %>
+                        <div class="address-detail">
+                            <p><strong>
+                                    <%= siparis.teslimat_adresi.ad %>
+                                        <%= siparis.teslimat_adresi.soyad %>
+                                </strong></p>
+                            <p>
+                                <%= siparis.teslimat_adresi.acik_adres %>
+                            </p>
+                            <p>
+                                <%= siparis.teslimat_adresi.ilce %> / <%= siparis.teslimat_adresi.il %>
+                            </p>
+                            <p>
+                                <%= siparis.teslimat_adresi.telefon %>
+                            </p>
+                        </div>
+                        <% } else { %>
+                            <p class="text-muted">Adres bilgisi bulunamadı.</p>
+                            <% } %>
+                </div>
+            </div>
+
+            <!-- Ödeme Bilgileri -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Ödeme Bilgileri</h3>
+                </div>
+                <div class="card-body">
+                    <div class="payment-detail">
+                        <div class="info-row">
+                            <span>Ödeme Yöntemi:</span>
+                            <strong>
+                                <%= siparis.odeme_yontemi==='kredi_karti' ? 'Kredi Kartı' : 'Havale/EFT' %>
+                            </strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Ödeme Durumu:</span>
+                            <% if (siparis.odeme_durumu==='odendi' ) { %>
+                                <span class="badge badge-success">Ödendi</span>
+                                <% } else if (siparis.odeme_durumu==='beklemede' ) { %>
+                                    <span class="badge badge-warning">Beklemede</span>
+                                    <% } else { %>
+                                        <span class="badge badge-danger">Başarısız</span>
+                                        <% } %>
+                        </div>
+                        <% if (siparis.odeme_id) { %>
+                            <div class="info-row">
+                                <span>İşlem No:</span>
+                                <code><%= siparis.odeme_id %></code>
+                            </div>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hızlı İşlemler -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Hızlı İşlemler</h3>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <button class="btn btn-secondary btn-block" onclick="window.print()">
+                            <i class="fas fa-print"></i> Yazdır
+                        </button>
+                        <a href="/admin/siparisler/<%= siparis.id %>/fatura" class="btn btn-secondary btn-block"
+                            target="_blank">
+                            <i class="fas fa-file-invoice"></i> Fatura Oluştur
+                        </a>
+                        <% if (siparis.siparis_durumu !=='iptal' ) { %>
+                            <button class="btn btn-danger btn-block" onclick="cancelOrder()">
+                                <i class="fas fa-times"></i> Siparişi İptal Et
+                            </button>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .order-date {
+            color: var(--admin-text-muted);
+            font-size: 0.9rem;
+        }
+
+        .order-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .order-main .card {
+            margin-bottom: 24px;
+        }
+
+        .status-form .status-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .status-form .form-group {
+            flex: 1;
+            margin: 0;
+        }
+
+        .status-form .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .product-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            background: var(--admin-bg);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        code {
+            background: var(--admin-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .customer-detail {
+            display: flex;
+            gap: 16px;
+        }
+
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--admin-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .customer-info h4 {
+            margin-bottom: 4px;
+        }
+
+        .customer-info p {
+            color: var(--admin-text-muted);
+            font-size: 0.9rem;
+            margin: 2px 0;
+        }
+
+        .address-detail p {
+            margin: 4px 0;
+            color: var(--admin-text-muted);
+        }
+
+        .address-detail p:first-child {
+            color: var(--admin-text);
+        }
+
+        .payment-detail .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .payment-detail .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .payment-detail .info-row span {
+            color: var(--admin-text-muted);
+        }
+
+        .quick-actions .btn {
+            margin-bottom: 8px;
+        }
+
+        .quick-actions .btn:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 992px) {
+            .order-detail-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .status-form .status-row {
+                flex-wrap: wrap;
+            }
+
+            .status-form .form-group {
+                min-width: 200px;
+            }
+        }
+    </style>
+
+    <script>
+        function cancelOrder() {
+            if (confirm('Bu siparişi iptal etmek istediğinize emin misiniz?')) {
+                fetch('/admin/siparisler/<%= siparis.id %>/durum-guncelle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'siparis_durumu=iptal'
+                }).then(() => location.reload());
+            }
+        }
+    </script>

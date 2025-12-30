@@ -1,0 +1,275 @@
+<% locals.currentPage='urunler' %>
+
+    <div class="page-header">
+        <h1 class="page-title">Ürün Yönetimi</h1>
+        <a href="/admin/urunler/ekle" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Ürün
+        </a>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-body">
+            <form id="filterForm" class="filter-form">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Arama</label>
+                        <input type="text" name="arama" class="form-control" placeholder="Ürün adı veya parça no..."
+                            value="<%= query.arama || '' %>">
+                    </div>
+                    <div class="filter-group">
+                        <label>Kategori</label>
+                        <select name="kategori" class="form-control">
+                            <option value="">Tümü</option>
+                            <% kategoriler.forEach(kat=> { %>
+                                <option value="<%= kat.id %>" <%=query.kategori==kat.id ? 'selected' : '' %>>
+                                    <%= kat.ad %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Marka</label>
+                        <select name="marka" class="form-control">
+                            <option value="">Tümü</option>
+                            <% markalar.forEach(marka=> { %>
+                                <option value="<%= marka.id %>" <%=query.marka==marka.id ? 'selected' : '' %>>
+                                    <%= marka.ad %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Durum</label>
+                        <select name="durum" class="form-control">
+                            <option value="">Tümü</option>
+                            <option value="1" <%=query.durum==='1' ? 'selected' : '' %>>Aktif</option>
+                            <option value="0" <%=query.durum==='0' ? 'selected' : '' %>>Pasif</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filtrele
+                        </button>
+                        <a href="/admin/urunler" class="btn btn-secondary">Temizle</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ürün Listesi -->
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th width="60">Resim</th>
+                            <th>Ürün Adı</th>
+                            <th>Parça No</th>
+                            <th>Kategori</th>
+                            <th>Fiyat</th>
+                            <th>Stok</th>
+                            <th>Durum</th>
+                            <th width="100">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (urunler && urunler.length> 0) { %>
+                            <% urunler.forEach(urun=> { %>
+                                <tr>
+                                    <td>
+                                        <div class="product-thumb">
+                                            <% if (urun.resimler && urun.resimler.length> 0) { %>
+                                                <img src="<%= urun.resimler[0].resim_url %>" alt="<%= urun.ad %>">
+                                                <% } else { %>
+                                                    <img src="/images/no-image.png" alt="<%= urun.ad %>">
+                                                    <% } %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="product-name">
+                                            <%= urun.ad.substring(0, 50) %>
+                                                <%= urun.ad.length> 50 ? '...' : '' %>
+                                        </div>
+                                        <% if (urun.marka) { %>
+                                            <small class="text-muted">
+                                                <%= urun.marka.ad %>
+                                            </small>
+                                            <% } %>
+                                    </td>
+                                    <td><code><%= urun.parca_no %></code></td>
+                                    <td>
+                                        <% if (urun.kategori) { %>
+                                            <%= urun.kategori.ad %>
+                                                <% } else { %>
+                                                    <span class="text-muted">-</span>
+                                                    <% } %>
+                                    </td>
+                                    <td><strong>
+                                            <%= parseFloat(urun.fiyat).toFixed(2).replace('.', ',' ) %> ₺
+                                        </strong></td>
+                                    <td>
+                                        <% if (urun.stok> 10) { %>
+                                            <span class="badge badge-success">
+                                                <%= urun.stok %>
+                                            </span>
+                                            <% } else if (urun.stok> 0) { %>
+                                                <span class="badge badge-warning">
+                                                    <%= urun.stok %>
+                                                </span>
+                                                <% } else { %>
+                                                    <span class="badge badge-danger">0</span>
+                                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (urun.durum) { %>
+                                            <span class="badge badge-success">Aktif</span>
+                                            <% } else { %>
+                                                <span class="badge badge-danger">Pasif</span>
+                                                <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/admin/urunler/<%= urun.id %>/duzenle"
+                                                class="btn btn-sm btn-icon btn-secondary" title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-icon btn-danger delete-product"
+                                                data-id="<%= urun.id %>" title="Sil">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="8"
+                                                style="text-align: center; padding: 40px; color: var(--admin-text-muted);">
+                                                Ürün bulunamadı.
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sayfalama -->
+    <% if (toplamSayfa> 1) { %>
+        <nav class="admin-pagination">
+            <% for (let i=1; i <=toplamSayfa; i++) { %>
+                <a href="?sayfa=<%= i %>&<%= Object.entries(query).filter(([k]) => k !== 'sayfa').map(([k, v]) => `${k}=${v}`).join('&') %>"
+                    class="pagination-btn <%= i === mevcutSayfa ? 'active' : '' %>">
+                    <%= i %>
+                </a>
+                <% } %>
+        </nav>
+        <% } %>
+
+            <style>
+                .filter-form .filter-row {
+                    display: flex;
+                    gap: 16px;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                }
+
+                .filter-group {
+                    flex: 1;
+                    min-width: 150px;
+                }
+
+                .filter-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-size: 0.85rem;
+                    color: var(--admin-text-muted);
+                }
+
+                .filter-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .product-thumb {
+                    width: 50px;
+                    height: 50px;
+                    background: var(--admin-bg);
+                    border-radius: 6px;
+                    padding: 4px;
+                }
+
+                .product-thumb img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
+
+                .product-name {
+                    font-weight: 500;
+                    margin-bottom: 4px;
+                }
+
+                code {
+                    background: var(--admin-bg);
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                }
+
+                .action-buttons {
+                    display: flex;
+                    gap: 4px;
+                }
+
+                .admin-pagination {
+                    display: flex;
+                    justify-content: center;
+                    gap: 8px;
+                    margin-top: 20px;
+                }
+
+                .admin-pagination .pagination-btn {
+                    min-width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--admin-card-bg);
+                    border: 1px solid var(--admin-border);
+                    border-radius: 6px;
+                    color: var(--admin-text-muted);
+                    text-decoration: none;
+                    transition: all 0.2s;
+                }
+
+                .admin-pagination .pagination-btn:hover,
+                .admin-pagination .pagination-btn.active {
+                    background: var(--admin-primary);
+                    border-color: var(--admin-primary);
+                    color: white;
+                }
+            </style>
+
+            <script>
+                document.querySelectorAll('.delete-product').forEach(btn => {
+                    btn.addEventListener('click', async function () {
+                        if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+
+                        const id = this.dataset.id;
+                        try {
+                            const response = await fetch(`/admin/urunler/${id}/sil`, { method: 'POST' });
+                            if (response.ok) {
+                                location.reload();
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            alert('Silme işlemi başarısız oldu.');
+                        }
+                    });
+                });
+            </script>

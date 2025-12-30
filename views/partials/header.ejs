@@ -1,0 +1,237 @@
+<!-- Header -->
+<header class="header">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="top-bar-left">
+                <span><i class="fas fa-phone-alt"></i> +90 (212) 555 00 00</span>
+                <span><i class="fas fa-envelope"></i> info@electrokomponents.com</span>
+            </div>
+            <div class="top-bar-right">
+                <div class="language-selector">
+                    <button class="lang-btn active">TR</button>
+                    <span class="lang-divider">|</span>
+                    <button class="lang-btn">EN</button>
+                </div>
+                <div class="currency-selector">
+                    <span>TL ₺</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container">
+            <!-- Logo -->
+            <a href="/" class="logo">
+                <span class="logo-icon"><i class="fas fa-microchip"></i></span>
+                <span class="logo-text">Electro<strong>Komponents</strong></span>
+            </a>
+
+            <!-- Arama -->
+            <div class="search-box">
+                <div class="search-category">
+                    <select id="searchCategory">
+                        <option value="">Tüm Kategoriler</option>
+                        <option value="yarilletkenler">Yarı İletkenler</option>
+                        <option value="pasif">Pasif Bileşenler</option>
+                        <option value="elektromekanik">Elektromekanik</option>
+                        <option value="konnektorler">Konnektörler</option>
+                    </select>
+                </div>
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" placeholder="Ürün adı veya parça numarası ile arayın..."
+                        autocomplete="off">
+                    <div class="search-autocomplete" id="searchAutocomplete"></div>
+                </div>
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Kullanıcı Aksiyonları -->
+            <div class="header-actions">
+                <% if (user) { %>
+                    <div class="header-action dropdown">
+                        <button class="action-btn">
+                            <i class="fas fa-user"></i>
+                            <span>
+                                <%= user.ad %>
+                            </span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="/hesabim"><i class="fas fa-user-circle"></i> Hesabım</a>
+                            <a href="/siparislerim"><i class="fas fa-box"></i> Siparişlerim</a>
+                            <a href="/favorilerim"><i class="fas fa-heart"></i> Favorilerim</a>
+                            <% if (user.rol==='admin' ) { %>
+                                <a href="/admin"><i class="fas fa-cog"></i> Admin Panel</a>
+                                <% } %>
+                                    <hr>
+                                    <a href="/auth/cikis"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+                        </div>
+                    </div>
+                    <% } else { %>
+                        <a href="/auth/giris" class="header-action">
+                            <button class="action-btn">
+                                <i class="fas fa-user"></i>
+                                <span>Giriş Yap</span>
+                            </button>
+                        </a>
+                        <% } %>
+
+                            <a href="/favorilerim" class="header-action">
+                                <button class="action-btn">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="action-badge" id="favoriteBadge">0</span>
+                                </button>
+                            </a>
+
+                            <button class="header-action cart-action" id="openCartDrawer">
+                                <div class="action-btn">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span class="action-badge" id="cartBadge">0</span>
+                                </div>
+                                <div class="cart-mini-total">
+                                    <span>Sepet</span>
+                                    <strong id="cartMiniTotal">0,00 ₺</strong>
+                                </div>
+                            </button>
+            </div>
+
+            <!-- Mobil Menü Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mega Menu -->
+    <nav class="mega-menu">
+        <div class="container">
+            <ul class="mega-menu-list">
+                <li class="mega-menu-item has-submenu">
+                    <a href="/kategori/yari-iletkenler">
+                        <i class="fas fa-microchip"></i>
+                        Yarı İletkenler
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="submenu-content">
+                            <div class="submenu-column">
+                                <h4>Entegreler</h4>
+                                <a href="#">Mikrodenetleyiciler (MCU)</a>
+                                <a href="#">Operasyonel Amplifikatörler</a>
+                                <a href="#">Voltaj Regülatörleri</a>
+                                <a href="#">Bellek IC'leri</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>Transistörler</h4>
+                                <a href="#">BJT Transistörler</a>
+                                <a href="#">MOSFET</a>
+                                <a href="#">IGBT</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>Diyotlar</h4>
+                                <a href="#">Zener Diyotlar</a>
+                                <a href="#">Schottky Diyotlar</a>
+                                <a href="#">LED</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="mega-menu-item has-submenu">
+                    <a href="/kategori/pasif-bilesenler">
+                        <i class="fas fa-wave-square"></i>
+                        Pasif Bileşenler
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="submenu-content">
+                            <div class="submenu-column">
+                                <h4>Dirençler</h4>
+                                <a href="#">SMD Dirençler</a>
+                                <a href="#">Through Hole Dirençler</a>
+                                <a href="#">Potansiyometreler</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>Kapasitörler</h4>
+                                <a href="#">Seramik Kapasitörler</a>
+                                <a href="#">Elektrolitik Kapasitörler</a>
+                                <a href="#">Film Kapasitörler</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>İndüktörler</h4>
+                                <a href="#">SMD İndüktörler</a>
+                                <a href="#">Through Hole İndüktörler</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="mega-menu-item has-submenu">
+                    <a href="/kategori/elektromekanik">
+                        <i class="fas fa-plug"></i>
+                        Elektromekanik
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="submenu-content">
+                            <div class="submenu-column">
+                                <h4>Röleler</h4>
+                                <a href="#">Elektromanyetik Röleler</a>
+                                <a href="#">Solid State Röleler</a>
+                                <a href="#">Zaman Röleleri</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>Anahtarlar</h4>
+                                <a href="#">Push Button</a>
+                                <a href="#">Toggle Switch</a>
+                                <a href="#">DIP Switch</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="mega-menu-item has-submenu">
+                    <a href="/kategori/konnektorler">
+                        <i class="fas fa-ethernet"></i>
+                        Konnektörler
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="submenu">
+                        <div class="submenu-content">
+                            <div class="submenu-column">
+                                <h4>PCB Konnektörler</h4>
+                                <a href="#">Pin Header</a>
+                                <a href="#">Terminal Bloklar</a>
+                                <a href="#">FPC/FFC Konnektörler</a>
+                            </div>
+                            <div class="submenu-column">
+                                <h4>Kablo Konnektörler</h4>
+                                <a href="#">USB Konnektörler</a>
+                                <a href="#">DC Jackler</a>
+                                <a href="#">Audio Jackler</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="mega-menu-item">
+                    <a href="/kategori/otomasyon">
+                        <i class="fas fa-robot"></i>
+                        Otomasyon
+                    </a>
+                </li>
+
+                <li class="mega-menu-item">
+                    <a href="/kategori/araclar-gerecler">
+                        <i class="fas fa-tools"></i>
+                        Araçlar & Gereçler
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

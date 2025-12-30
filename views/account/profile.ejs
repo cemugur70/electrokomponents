@@ -1,0 +1,369 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li class="active">Hesabım</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="account-page">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar -->
+            <aside class="account-sidebar">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h3>
+                            <%= user.ad %>
+                                <%= user.soyad %>
+                        </h3>
+                        <span>
+                            <%= user.email %>
+                        </span>
+                    </div>
+                </div>
+
+                <nav class="account-nav">
+                    <a href="/hesabim" class="nav-link active">
+                        <i class="fas fa-user-circle"></i>
+                        Hesap Bilgilerim
+                    </a>
+                    <a href="/siparislerim" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        Siparişlerim
+                    </a>
+                    <a href="/adreslerim" class="nav-link">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Adreslerim
+                    </a>
+                    <a href="/favorilerim" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        Favorilerim
+                    </a>
+                    <a href="/sifre-degistir" class="nav-link">
+                        <i class="fas fa-lock"></i>
+                        Şifre Değiştir
+                    </a>
+                    <a href="/auth/cikis" class="nav-link logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış Yap
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <main class="account-content">
+                <div class="content-header">
+                    <h1>Hesap Bilgilerim</h1>
+                    <p>Kişisel bilgilerinizi ve firma bilgilerinizi güncelleyebilirsiniz.</p>
+                </div>
+
+                <form action="/hesabim" method="POST" class="account-form">
+                    <!-- Kişisel Bilgiler -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Kişisel Bilgiler</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ad">Ad *</label>
+                                <input type="text" id="ad" name="ad" value="<%= user.ad %>" required
+                                    class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="soyad">Soyad *</label>
+                                <input type="text" id="soyad" name="soyad" value="<%= user.soyad %>" required
+                                    class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">E-posta Adresi *</label>
+                                <input type="email" id="email" name="email" value="<%= user.email %>" required
+                                    class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefon">Telefon</label>
+                                <input type="tel" id="telefon" name="telefon" value="<%= user.telefon || '' %>"
+                                    class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firma Bilgileri (Kurumsal için) -->
+                    <% if (user.uyelik_tipi==='kurumsal' ) { %>
+                        <div class="form-section">
+                            <h3><i class="fas fa-building"></i> Firma Bilgileri</h3>
+
+                            <div class="form-group">
+                                <label for="firma_adi">Firma Adı *</label>
+                                <input type="text" id="firma_adi" name="firma_adi" value="<%= user.firma_adi || '' %>"
+                                    required class="form-control">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="vergi_no">Vergi No *</label>
+                                    <input type="text" id="vergi_no" name="vergi_no" value="<%= user.vergi_no || '' %>"
+                                        required class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="vergi_dairesi">Vergi Dairesi *</label>
+                                    <input type="text" id="vergi_dairesi" name="vergi_dairesi"
+                                        value="<%= user.vergi_dairesi || '' %>" required class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <!-- İletişim Tercihleri -->
+                            <div class="form-section">
+                                <h3><i class="fas fa-bell"></i> İletişim Tercihleri</h3>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="email_izni" <%=user.email_izni ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    Kampanya ve yeniliklerden e-posta ile haberdar olmak istiyorum.
+                                </label>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="sms_izni" <%=user.sms_izni ? 'checked' : '' %>>
+                                    <span class="checkmark"></span>
+                                    SMS ile bildirim almak istiyorum.
+                                </label>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save"></i>
+                                    Bilgileri Güncelle
+                                </button>
+                            </div>
+                </form>
+            </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-page {
+        padding: 30px 0 60px;
+    }
+
+    .account-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+    }
+
+    /* Sidebar */
+    .account-sidebar {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 24px;
+        background: var(--bg-input);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-avatar {
+        width: 56px;
+        height: 56px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .user-details h3 {
+        font-size: 1rem;
+        margin-bottom: 4px;
+    }
+
+    .user-details span {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .account-nav {
+        padding: 16px 0;
+    }
+
+    .account-nav .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 24px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .account-nav .nav-link:hover {
+        color: var(--color-primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .account-nav .nav-link.active {
+        color: var(--color-primary);
+        background: rgba(59, 130, 246, 0.1);
+        border-right: 3px solid var(--color-primary);
+    }
+
+    .account-nav .nav-link.logout {
+        color: var(--color-error);
+    }
+
+    .account-nav .nav-link.logout:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Content */
+    .account-content {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 30px;
+    }
+
+    .content-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .content-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    .content-header p {
+        color: var(--text-muted);
+    }
+
+    /* Form */
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .form-section h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        margin-bottom: 16px;
+        color: var(--text-secondary);
+    }
+
+    .checkbox-label input {
+        display: none;
+    }
+
+    .checkbox-label .checkmark {
+        width: 20px;
+        height: 20px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .checkbox-label input:checked+.checkmark {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .checkbox-label input:checked+.checkmark::after {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        width: 6px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .form-actions {
+        padding-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .account-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

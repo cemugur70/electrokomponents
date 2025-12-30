@@ -1,0 +1,400 @@
+<!-- Breadcrumb -->
+<nav class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            <li><a href="/">Ana Sayfa</a></li>
+            <li><a href="/hesabim">Hesabım</a></li>
+            <li class="active">Adreslerim</li>
+        </ol>
+    </div>
+</nav>
+
+<div class="account-page">
+    <div class="container">
+        <div class="account-layout">
+            <!-- Sidebar -->
+            <%- include('../partials/account-sidebar', { activePage: 'adreslerim' }) %>
+
+                <!-- Content -->
+                <main class="account-content">
+                    <div class="content-header">
+                        <h1>Adreslerim</h1>
+                        <button class="btn btn-primary" id="addAddressBtn">
+                            <i class="fas fa-plus"></i> Yeni Adres Ekle
+                        </button>
+                    </div>
+
+                    <div class="addresses-grid">
+                        <% if (adresler && adresler.length> 0) { %>
+                            <% adresler.forEach(adres=> { %>
+                                <div class="address-card-item" data-id="<%= adres.id %>">
+                                    <div class="address-card-header">
+                                        <h3>
+                                            <%= adres.baslik %>
+                                        </h3>
+                                        <% if (adres.varsayilan) { %>
+                                            <span class="default-badge">Varsayılan</span>
+                                            <% } %>
+                                    </div>
+                                    <div class="address-card-body">
+                                        <p class="address-name">
+                                            <%= adres.ad %>
+                                                <%= adres.soyad %>
+                                        </p>
+                                        <p class="address-text">
+                                            <%= adres.acik_adres %>
+                                        </p>
+                                        <p class="address-location">
+                                            <%= adres.ilce %> / <%= adres.il %>
+                                        </p>
+                                        <p class="address-phone">
+                                            <%= adres.telefon %>
+                                        </p>
+                                    </div>
+                                    <div class="address-card-actions">
+                                        <button class="btn btn-sm btn-secondary edit-address" data-id="<%= adres.id %>">
+                                            <i class="fas fa-edit"></i> Düzenle
+                                        </button>
+                                        <% if (!adres.varsayilan) { %>
+                                            <button class="btn btn-sm btn-secondary set-default"
+                                                data-id="<%= adres.id %>">
+                                                <i class="fas fa-star"></i> Varsayılan Yap
+                                            </button>
+                                            <% } %>
+                                                <button class="btn btn-sm btn-danger delete-address"
+                                                    data-id="<%= adres.id %>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } else { %>
+                                        <div class="no-addresses">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <h3>Kayıtlı Adres Yok</h3>
+                                            <p>Henüz kayıtlı bir adresiniz bulunmuyor.</p>
+                                        </div>
+                                        <% } %>
+                    </div>
+                </main>
+        </div>
+    </div>
+</div>
+
+<!-- Adres Modal -->
+<div class="modal" id="addressModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Yeni Adres Ekle</h3>
+            <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <form id="addressForm" action="/adreslerim/kaydet" method="POST">
+            <input type="hidden" name="adres_id" id="adresId">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Adres Başlığı *</label>
+                    <input type="text" name="baslik" id="baslik" class="form-control" placeholder="Örn: Ev, İş"
+                        required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ad *</label>
+                        <input type="text" name="ad" id="adresAd" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad *</label>
+                        <input type="text" name="soyad" id="adresSoyad" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Telefon *</label>
+                    <input type="tel" name="telefon" id="telefon" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>İl *</label>
+                        <select name="il" id="il" class="form-control" required>
+                            <option value="">Seçiniz</option>
+                            <option value="Adana">Adana</option>
+                            <option value="Ankara">Ankara</option>
+                            <option value="Antalya">Antalya</option>
+                            <option value="Bursa">Bursa</option>
+                            <option value="İstanbul">İstanbul</option>
+                            <option value="İzmir">İzmir</option>
+                            <option value="Kocaeli">Kocaeli</option>
+                            <!-- Diğer iller -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>İlçe *</label>
+                        <input type="text" name="ilce" id="ilce" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Açık Adres *</label>
+                    <textarea name="acik_adres" id="acikAdres" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Posta Kodu</label>
+                    <input type="text" name="posta_kodu" id="postaKodu" class="form-control">
+                </div>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" name="varsayilan" id="varsayilan">
+                    <span class="checkmark"></span>
+                    Varsayılan adres olarak ayarla
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBtn">İptal</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .addresses-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .address-card-item {
+        background: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+    }
+
+    .address-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .address-card-header h3 {
+        font-size: 1rem;
+    }
+
+    .default-badge {
+        background: var(--color-primary);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+    }
+
+    .address-card-body p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    .address-name {
+        color: var(--text-primary) !important;
+        font-weight: 500;
+    }
+
+    .address-card-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .no-addresses {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px;
+        background: var(--bg-input);
+        border-radius: var(--radius-lg);
+    }
+
+    .no-addresses i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .no-addresses h3 {
+        margin-bottom: 10px;
+    }
+
+    .no-addresses p {
+        color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+        position: relative;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .modal-close {
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+        .addresses-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+            margin: 20px;
+        }
+    }
+</style>
+
+<script>
+    const modal = document.getElementById('addressModal');
+    const addBtn = document.getElementById('addAddressBtn');
+    const closeBtn = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const form = document.getElementById('addressForm');
+
+    function openModal(title = 'Yeni Adres Ekle') {
+        document.getElementById('modalTitle').textContent = title;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        form.reset();
+        document.getElementById('adresId').value = '';
+    }
+
+    addBtn?.addEventListener('click', () => openModal());
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+    document.querySelector('.modal-overlay')?.addEventListener('click', closeModal);
+
+    // Edit Address
+    document.querySelectorAll('.edit-address').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const id = this.dataset.id;
+            try {
+                const response = await fetch(`/api/adresler/${id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const adres = data.data;
+                    document.getElementById('adresId').value = adres.id;
+                    document.getElementById('baslik').value = adres.baslik;
+                    document.getElementById('adresAd').value = adres.ad;
+                    document.getElementById('adresSoyad').value = adres.soyad;
+                    document.getElementById('telefon').value = adres.telefon;
+                    document.getElementById('il').value = adres.il;
+                    document.getElementById('ilce').value = adres.ilce;
+                    document.getElementById('acikAdres').value = adres.acik_adres;
+                    document.getElementById('postaKodu').value = adres.posta_kodu || '';
+                    document.getElementById('varsayilan').checked = adres.varsayilan;
+                    openModal('Adresi Düzenle');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    // Delete Address
+    document.querySelectorAll('.delete-address').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            if (!confirm('Bu adresi silmek istediğinize emin misiniz?')) return;
+
+            const id = this.dataset.id;
+            try {
+                const response = await fetch(`/adreslerim/sil/${id}`, { method: 'POST' });
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    // Set Default
+    document.querySelectorAll('.set-default').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const id = this.dataset.id;
+            try {
+                const response = await fetch(`/adreslerim/varsayilan/${id}`, { method: 'POST' });
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+</script>

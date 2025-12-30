@@ -1,0 +1,274 @@
+<% locals.currentPage='siparisler' %>
+
+    <div class="page-header">
+        <h1 class="page-title">Sipariş Yönetimi</h1>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= bekleyenler || 0 %>
+                </h3>
+                <p>Bekleyen</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= hazirlananlar || 0 %>
+                </h3>
+                <p>Hazırlanan</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= kargodakiler || 0 %>
+                </h3>
+                <p>Kargoda</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>
+                    <%= tamamlananlar || 0 %>
+                </h3>
+                <p>Tamamlanan</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-body">
+            <form class="filter-form">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Sipariş No</label>
+                        <input type="text" name="siparis_no" class="form-control" placeholder="Sipariş No"
+                            value="<%= query.siparis_no || '' %>">
+                    </div>
+                    <div class="filter-group">
+                        <label>Durum</label>
+                        <select name="durum" class="form-control">
+                            <option value="">Tümü</option>
+                            <option value="beklemede" <%=query.durum==='beklemede' ? 'selected' : '' %>>Beklemede
+                            </option>
+                            <option value="onaylandi" <%=query.durum==='onaylandi' ? 'selected' : '' %>>Onaylandı
+                            </option>
+                            <option value="hazirlaniyor" <%=query.durum==='hazirlaniyor' ? 'selected' : '' %>
+                                >Hazırlanıyor</option>
+                            <option value="kargoda" <%=query.durum==='kargoda' ? 'selected' : '' %>>Kargoda</option>
+                            <option value="teslim_edildi" <%=query.durum==='teslim_edildi' ? 'selected' : '' %>>Teslim
+                                Edildi</option>
+                            <option value="iptal" <%=query.durum==='iptal' ? 'selected' : '' %>>İptal</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tarih</label>
+                        <input type="date" name="tarih" class="form-control" value="<%= query.tarih || '' %>">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filtrele
+                        </button>
+                        <a href="/admin/siparisler" class="btn btn-secondary">Temizle</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sipariş Listesi -->
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Sipariş No</th>
+                            <th>Müşteri</th>
+                            <th>Ürünler</th>
+                            <th>Toplam</th>
+                            <th>Ödeme</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (siparisler && siparisler.length> 0) { %>
+                            <% siparisler.forEach(siparis=> { %>
+                                <tr>
+                                    <td>
+                                        <strong class="order-no">#<%= siparis.siparis_no %></strong>
+                                    </td>
+                                    <td>
+                                        <% if (siparis.kullanici) { %>
+                                            <div class="customer-info">
+                                                <span>
+                                                    <%= siparis.kullanici.ad %>
+                                                        <%= siparis.kullanici.soyad %>
+                                                </span>
+                                                <small>
+                                                    <%= siparis.kullanici.email %>
+                                                </small>
+                                            </div>
+                                            <% } else { %>
+                                                <span class="text-muted">Misafir</span>
+                                                <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="product-count">
+                                            <%= siparis.urunler ? siparis.urunler.length : 0 %> ürün
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <%= parseFloat(siparis.toplam_tutar).toFixed(2).replace('.', ',' ) %> ₺
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <% if (siparis.odeme_durumu==='odendi' ) { %>
+                                            <span class="badge badge-success">Ödendi</span>
+                                            <% } else if (siparis.odeme_durumu==='beklemede' ) { %>
+                                                <span class="badge badge-warning">Beklemede</span>
+                                                <% } else { %>
+                                                    <span class="badge badge-danger">Başarısız</span>
+                                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <% const durumlar={ 'beklemede' : { class: 'warning' , text: 'Beklemede'
+                                            }, 'onaylandi' : { class: 'primary' , text: 'Onaylandı' }, 'hazirlaniyor' :
+                                            { class: 'primary' , text: 'Hazırlanıyor' }, 'kargoda' : { class: 'primary'
+                                            , text: 'Kargoda' }, 'teslim_edildi' : { class: 'success' ,
+                                            text: 'Teslim Edildi' }, 'iptal' : { class: 'danger' , text: 'İptal' } };
+                                            const durum=durumlar[siparis.siparis_durumu] || { class: 'secondary' , text:
+                                            siparis.siparis_durumu }; %>
+                                            <span class="badge badge-<%= durum.class %>">
+                                                <%= durum.text %>
+                                            </span>
+                                    </td>
+                                    <td>
+                                        <%= new Date(siparis.created_at).toLocaleDateString('tr-TR') %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/siparisler/<%= siparis.id %>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="8"
+                                                style="text-align: center; padding: 40px; color: var(--admin-text-muted);">
+                                                Sipariş bulunamadı.
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sayfalama -->
+    <% if (toplamSayfa> 1) { %>
+        <nav class="admin-pagination">
+            <% for (let i=1; i <=toplamSayfa; i++) { %>
+                <a href="?sayfa=<%= i %>&<%= Object.entries(query).filter(([k]) => k !== 'sayfa').map(([k, v]) => `${k}=${v}`).join('&') %>"
+                    class="pagination-btn <%= i === mevcutSayfa ? 'active' : '' %>">
+                    <%= i %>
+                </a>
+                <% } %>
+        </nav>
+        <% } %>
+
+            <style>
+                .filter-form .filter-row {
+                    display: flex;
+                    gap: 16px;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                }
+
+                .filter-group {
+                    flex: 1;
+                    min-width: 150px;
+                }
+
+                .filter-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-size: 0.85rem;
+                    color: var(--admin-text-muted);
+                }
+
+                .filter-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .order-no {
+                    color: var(--admin-primary);
+                }
+
+                .customer-info {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .customer-info small {
+                    color: var(--admin-text-muted);
+                }
+
+                .product-count {
+                    padding: 4px 10px;
+                    background: var(--admin-bg);
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                }
+
+                .admin-pagination {
+                    display: flex;
+                    justify-content: center;
+                    gap: 8px;
+                    margin-top: 20px;
+                }
+
+                .admin-pagination .pagination-btn {
+                    min-width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--admin-card-bg);
+                    border: 1px solid var(--admin-border);
+                    border-radius: 6px;
+                    color: var(--admin-text-muted);
+                    text-decoration: none;
+                    transition: all 0.2s;
+                }
+
+                .admin-pagination .pagination-btn:hover,
+                .admin-pagination .pagination-btn.active {
+                    background: var(--admin-primary);
+                    border-color: var(--admin-primary);
+                    color: white;
+                }
+            </style>
